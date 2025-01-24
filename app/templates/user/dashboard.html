@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .hero-title {
+        color: #ff3333;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    .hero-subtitle {
+        color: #ff4444;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    .feature-card {
+        border: none;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #ff5555;
+    }
+    .feature-title {
+        color: #ff4444;
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    .feature-text {
+        color: #ff5555;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <h1 class="hero-title">Welcome to CourageFX</h1>
+        <p class="hero-subtitle">Advanced Automated Trading Solutions</p>
+    </div>
+
+    <!-- Main Features -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <i class="bx bx-line-chart feature-icon"></i>
+                    <h3 class="feature-title">Precision Master</h3>
+                    <p class="feature-text">
+                        Our flagship Over/Under specialist bot uses advanced algorithms to predict market movements with high accuracy. Perfect for short-term trading opportunities.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <i class="bx bx-trending-up feature-icon"></i>
+                    <h3 class="feature-title">Trend Warrior</h3>
+                    <p class="feature-text">
+                        Master the Rise/Fall markets with our trend-following bot. Utilizes multiple timeframes and dynamic entry points for optimal trade execution.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body text-center">
+                    <i class="bx bx-radar feature-icon"></i>
+                    <h3 class="feature-title">Pattern Hunter</h3>
+                    <p class="feature-text">
+                        Advanced pattern recognition bot that identifies and trades complex market patterns. Includes historical analysis and strength indicators.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="card mb-5">
+        <div class="card-body">
+            <h2 class="text-center mb-4" style="color: #ff3333;">How It Works</h2>
+            <div class="row">
+                <div class="col-md-3 text-center mb-4">
+                    <i class="bx bx-link feature-icon"></i>
+                    <h4 class="feature-title">Connect API</h4>
+                    <p class="feature-text">Link your Deriv account via secure API connection</p>
+                </div>
+                <div class="col-md-3 text-center mb-4">
+                    <i class="bx bx-bot feature-icon"></i>
+                    <h4 class="feature-title">Choose Bot</h4>
+                    <p class="feature-text">Select from our specialized trading bots</p>
+                </div>
+                <div class="col-md-3 text-center mb-4">
+                    <i class="bx bx-slider feature-icon"></i>
+                    <h4 class="feature-title">Configure</h4>
+                    <p class="feature-text">Set your trading parameters and risk management</p>
+                </div>
+                <div class="col-md-3 text-center mb-4">
+                    <i class="bx bx-play-circle feature-icon"></i>
+                    <h4 class="feature-title">Launch</h4>
+                    <p class="feature-text">Start automated trading with real-time monitoring</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Benefits -->
+    <div class="card">
+        <div class="card-body">
+            <h2 class="text-center mb-4" style="color: #ff3333;">Key Benefits</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="bx bx-check-shield me-3 feature-icon"></i>
+                        <div>
+                            <h4 class="feature-title">Secure Trading</h4>
+                            <p class="feature-text">Bank-grade security with encrypted API connections</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="bx bx-analyse me-3 feature-icon"></i>
+                        <div>
+                            <h4 class="feature-title">Advanced Analytics</h4>
+                            <p class="feature-text">Real-time performance tracking and analysis</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="d-flex align-items-start">
+                        <i class="bx bx-support me-3 feature-icon"></i>
+                        <div>
+                            <h4 class="feature-title">24/7 Support</h4>
+                            <p class="feature-text">Dedicated support team for all your trading needs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Get Started Button -->
+    <div class="text-center mt-5">
+        <a href="{{ url_for('user.bots') }}" class="btn btn-primary btn-lg">
+            <i class="bx bx-rocket"></i> Get Started with Trading Bots
+        </a>
+    </div>
+</div>
+{% endblock %}

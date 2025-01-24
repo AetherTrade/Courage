@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>User Management</h2>
+        <a href="{{ url_for('admin.index') }}" class="btn btn-outline-primary">
+            <i class="bx bx-arrow-back"></i> Back to Admin Dashboard
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Trend Warrior</th>
+                            <th>Precision Master</th>
+                            <th>Pattern Hunter</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <form action="{{ url_for('admin.toggle_bot_approval', user_id=user.id, bot_type='precision_master') }}" 
+                                      method="POST" class="d-inline">
+                                    <button type="submit" 
+                                            class="btn btn-sm {{ 'btn-success' if user.precision_master_approved else 'btn-outline-success' }}">
+                                        <i class="bx {{ 'bx-check' if user.precision_master_approved else 'bx-x' }}"></i>
+                                        {{ 'Approved' if user.precision_master_approved else 'Not Approved' }}
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('admin.toggle_bot_approval', user_id=user.id, bot_type='trend_warrior') }}" 
+                                      method="POST" class="d-inline">
+                                    <button type="submit" 
+                                            class="btn btn-sm {{ 'btn-success' if user.trend_warrior_approved else 'btn-outline-success' }}">
+                                        <i class="bx {{ 'bx-check' if user.trend_warrior_approved else 'bx-x' }}"></i>
+                                        {{ 'Approved' if user.trend_warrior_approved else 'Not Approved' }}
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('admin.toggle_bot_approval', user_id=user.id, bot_type='pattern_hunter') }}" 
+                                      method="POST" class="d-inline">
+                                    <button type="submit" 
+                                            class="btn btn-sm {{ 'btn-success' if user.pattern_hunter_approved else 'btn-outline-success' }}">
+                                        <i class="bx {{ 'bx-check' if user.pattern_hunter_approved else 'bx-x' }}"></i>
+                                        {{ 'Approved' if user.pattern_hunter_approved else 'Not Approved' }}
+                                    </button>
+                                </form>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        onclick="confirmDelete('{{ user.email }}', {{ user.id }})">
+                                    <i class="bx bx-trash"></i> Delete
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="userDetails">
+                    <!-- User details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId">
+                    <div class="mb-3">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="editFirstName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="editLastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editIsActive">
+                            <label class="form-check-label">Active</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveUserChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete user: <span id="deleteUserEmail"></span>?</p>
+                <p class="text-danger">This action cannot be undone!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" action="" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Delete User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmDelete(email, userId) {
+    document.getElementById('deleteUserEmail').textContent = email;
+    document.getElementById('deleteForm').action = "{{ url_for('admin.remove_user', user_id=0) }}".replace('0', userId);
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

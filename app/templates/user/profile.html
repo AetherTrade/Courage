@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Profile Information -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <img src="{{ user.avatar_url or url_for('static', filename='images/default-avatar.png') }}"
+                             class="rounded-circle img-thumbnail" alt="Profile Picture"
+                             style="width: 150px; height: 150px; object-fit: cover;">
+                    </div>
+                    <h4 class="card-title">{{ user.full_name }}</h4>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="document.getElementById('avatarInput').click()">
+                        <i class="bx bx-camera"></i> Change Photo
+                    </button>
+                    <input type="file" id="avatarInput" hidden accept="image/*">
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Settings -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Profile Settings</h5>
+                    <form id="profileForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" name="first_name" 
+                                       value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" name="last_name" 
+                                       value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" 
+                                   value="{{ user.email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" name="phone" 
+                                   value="{{ user.phone or '' }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Security Settings</h5>
+                    <form id="securityForm">
+                        <div class="mb-3">
+                            <label class="form-label">Current Password</label>
+                            <input type="password" class="form-control" name="current_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-control" name="new_password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-lock-alt"></i> Change Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- API Keys -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">API Keys</h5>
+                    <div class="mb-3">
+                        <label class="form-label">Your API Key</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="apiKey" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="generateApiKey()">
+                                <i class="bx bx-refresh"></i> Generate New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}

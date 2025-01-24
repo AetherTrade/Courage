@@ -1,0 +1,810 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- API Connection Card -->
+            <div class="card api-card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">CourageFX Pattern Hunter</h3>
+                    <p class="text-muted">Pattern Recognition Specialist</p>
+                    
+                    <div class="features mb-4">
+                        <div><i class="bx bx-check text-success"></i> Smart Pattern Detection</div>
+                        <div><i class="bx bx-check text-success"></i> Multi-Market Analysis</div>
+                        <div><i class="bx bx-check text-success"></i> Dynamic Entry Points</div>
+                        <div><i class="bx bx-check text-success"></i> Advanced Risk Management</div>
+                    </div>
+                    
+                    <form id="apiForm">
+                        <div class="mb-3">
+                            <label class="form-label">Deriv API Token</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="apiToken" required>
+                                <button class="btn btn-outline-secondary" type="button" id="toggleToken">
+                                    <i class="bx bx-show"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                Get your API token from <a href="https://app.deriv.com/account/api-token" target="_blank">Deriv</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="connectBtn">
+                            <i class="bx bx-link"></i>
+                            <span class="loading-spinner spinner-border spinner-border-sm"></span>
+                            Connect
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Info Card -->
+            <div class="card api-card mb-4" id="accountInfo" style="display: none;">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-1" id="accountName">-</h5>
+                            <p class="text-muted mb-0" id="accountType">-</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="balance-card p-3 rounded">
+                                <div class="balance-value" id="balanceAmount">0.00</div>
+                                <div class="currency" id="balanceCurrency">USD</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-danger mt-3" id="disconnectBtn">
+                        <i class="bx bx-log-out"></i> Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trading Stats Card -->
+            <div class="card api-card mb-4" id="tradingStats" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Trading Statistics</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Total Trades</label>
+                                <div class="stat-value" id="totalTrades">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Wins</label>
+                                <div class="stat-value text-success" id="winCount">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Losses</label>
+                                <div class="stat-value text-danger" id="lossCount">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Profit/Loss</label>
+                                <div class="stat-value" id="profitLoss">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="card api-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Activity Log</h5>
+                    <div class="activity-log" id="activityLog"></div>
+                </div>
+            </div>
+
+            <!-- Trading Controls -->
+            <div class="card api-card mb-4" id="tradingSection" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Pattern Match/Differ Bot</h5>
+                    
+                    <div class="trading-controls">
+                        <div class="trade-params">
+                            <!-- Market Selection -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Market</label>
+                                    <select class="form-control" id="market">
+                                        <optgroup label="1 Second Volatility">
+                                            <option value="1HZ10V">Volatility 10 (1s)</option>
+                                            <option value="1HZ25V">Volatility 25 (1s)</option>
+                                            <option value="1HZ50V">Volatility 50 (1s)</option>
+                                            <option value="1HZ75V">Volatility 75 (1s)</option>
+                                            <option value="1HZ100V">Volatility 100 (1s)</option>
+                                        </optgroup>
+                                        <optgroup label="Standard Volatility">
+                                            <option value="R_10">Volatility 10 Index</option>
+                                            <option value="R_25">Volatility 25 Index</option>
+                                            <option value="R_50">Volatility 50 Index</option>
+                                            <option value="R_75">Volatility 75 Index</option>
+                                            <option value="R_100">Volatility 100 Index</option>
+                                        </optgroup>
+                                        <optgroup label="Crash/Boom">
+                                            <option value="CRASH_1000">Crash 1000 Index</option>
+                                            <option value="BOOM_1000">Boom 1000 Index</option>
+                                            <option value="CRASH_500">Crash 500 Index</option>
+                                            <option value="BOOM_500">Boom 500 Index</option>
+                                        </optgroup>
+                                        <optgroup label="Bear/Bull">
+                                            <option value="RDBEAR">Bear Market Index</option>
+                                            <option value="RDBULL">Bull Market Index</option>
+                                        </optgroup>
+                                        <optgroup label="Step Indices">
+                                            <option value="STPRNG">Step Index</option>
+                                            <option value="WLDSTEP">Step Index ×10</option>
+                                            <option value="STPIND">Step Index ×100</option>
+                                        </optgroup>
+                                        <optgroup label="Range Break">
+                                            <option value="RNG100">Range Break 100 Index</option>
+                                            <option value="RNG200">Range Break 200 Index</option>
+                                            <option value="RNG50">Range Break 50 Index</option>
+                                        </optgroup>
+                                        <optgroup label="Jump Indices">
+                                            <option value="JD10">Jump 10 Index</option>
+                                            <option value="JD25">Jump 25 Index</option>
+                                            <option value="JD50">Jump 50 Index</option>
+                                            <option value="JD75">Jump 75 Index</option>
+                                            <option value="JD100">Jump 100 Index</option>
+                                            <option value="JD150">Jump 150 Index</option>
+                                            <option value="JD200">Jump 200 Index</option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="form-text text-white-50">
+                                        Select market type and volatility level
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Trade Type</label>
+                                    <select class="form-control" id="tradeType">
+                                        <option value="match">Match</option>
+                                        <option value="differ">Differ</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Trade Parameters -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Target Digit</label>
+                                    <select class="form-control" id="targetDigit">
+                                        <option value="last">Last Digit</option>
+                                        <option value="previous">Previous Digit</option>
+                                        <option value="manual">Manual Input</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4" id="manualDigitDiv" style="display: none;">
+                                    <label class="form-label">Manual Digit</label>
+                                    <input type="number" class="form-control" id="manualDigit" min="0" max="9" value="0">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Stake Amount ($)</label>
+                                    <input type="number" class="form-control" id="stakeAmount" value="1" min="1" step="1">
+                                </div>
+                            </div>
+
+                            <!-- Add pattern input section -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Pattern Length</label>
+                                    <select class="form-control" id="patternLength">
+                                        <option value="0">No Pattern</option>
+                                        <option value="2">2 Digits</option>
+                                        <option value="3">3 Digits</option>
+                                        <option value="4">4 Digits</option>
+                                        <option value="5">5 Digits</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <div id="patternInputs" class="row" style="display: none;">
+                                        <label class="form-label">Custom Pattern</label>
+                                        <div class="pattern-fields d-flex gap-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Add a pattern toggle switch in the trading controls -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="usePatterns">
+                                        <label class="form-check-label">Use Pattern Analysis</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Add Martingale controls -->
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="martingaleStrategy">
+                                        <label class="form-check-label">Use Martingale</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" id="martingaleMultiplierDiv" style="display: none;">
+                                    <label class="form-label">Multiplier</label>
+                                    <input type="number" class="form-control" id="martingaleMultiplier" value="2" min="1.1" step="0.1">
+                                    <small class="form-text text-white-50">Multiply stake after loss</small>
+                                </div>
+                            </div>
+
+                            <!-- Trading Controls -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <button class="btn btn-success me-2" id="startBot">
+                                        <i class="bx bx-play"></i> Start Bot
+                                    </button>
+                                    <button class="btn btn-danger me-2" id="stopBot" disabled>
+                                        <i class="bx bx-stop"></i> Stop Bot
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styles for dark theme */
+    .card-title, 
+    .text-muted, 
+    .features, 
+    label, 
+    .form-text,
+    .stat-value,
+    .balance-value,
+    .currency,
+    .activity-log,
+    #accountName,
+    #accountType,
+    #potentialPayout,
+    #buyReturn {
+        color: white !important;
+    }
+    
+    .text-muted {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    .form-control {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    .form-control:focus {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+
+    /* Activity Log styles */
+    .activity-log {
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    .log-entry {
+        margin-bottom: 5px;
+        padding: 5px;
+        border-radius: 4px;
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .log-entry.info {
+        color: #8be9fd !important;
+    }
+
+    .log-entry.success {
+        color: #50fa7b !important;
+    }
+
+    .log-entry.warning {
+        color: #ffb86c !important;
+    }
+
+    .log-entry.error {
+        color: #ff5555 !important;
+    }
+
+    /* Stats styles */
+    .stat-item {
+        text-align: center;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .stat-item label {
+        font-size: 0.9rem;
+        color: #888;
+        margin-bottom: 5px;
+    }
+    
+    .stat-item .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    /* Add these styles to your existing styles */
+    select.form-control {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    select.form-control option {
+        background-color: white !important;
+        color: black !important;
+        padding: 8px;
+    }
+
+    select.form-control optgroup {
+        background-color: #f8f9fa !important;
+        color: black !important;
+        font-weight: bold;
+    }
+
+    /* Hover state for options */
+    select.form-control option:hover,
+    select.form-control option:focus {
+        background-color: #e9ecef !important;
+        cursor: pointer;
+    }
+
+    /* Selected state */
+    select.form-control option:checked {
+        background-color: #007bff !important;
+        color: white !important;
+    }
+
+    /* Input styling to match */
+    input.form-control {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    input.form-control::placeholder {
+        color: #6c757d !important;
+    }
+
+    /* Add styles for pattern inputs */
+    .pattern-fields {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .pattern-digit {
+        text-align: center;
+        font-family: monospace;
+        font-size: 1.2em;
+    }
+</style>
+
+<script>
+// Initialize WebSocket connection
+let ws = null;
+let isTrading = false;
+let lastDigits = [];
+let lastTradeTime = 0;
+const TRADE_DELAY = 2000;
+
+// Add contract tracking
+let activeContracts = new Map();
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const storedToken = localStorage.getItem('deriv_api_token');
+    if (storedToken) {
+        document.getElementById('apiToken').value = storedToken;
+        document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+    }
+    addLogEntry('Bot initialized and ready to connect', 'info');
+});
+
+// Toggle API token visibility
+document.getElementById('toggleToken').addEventListener('click', function() {
+    const apiToken = document.getElementById('apiToken');
+    const icon = this.querySelector('i');
+    if (apiToken.type === 'password') {
+        apiToken.type = 'text';
+        icon.classList.replace('bx-show', 'bx-hide');
+    } else {
+        apiToken.type = 'password';
+        icon.classList.replace('bx-hide', 'bx-show');
+    }
+});
+
+// Update the connection handler
+document.getElementById('apiForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const token = document.getElementById('apiToken').value;
+    ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1089');
+    
+    ws.onopen = function() {
+        addLogEntry('WebSocket connection established', 'success');
+        // Send authorize request
+        ws.send(JSON.stringify({
+            authorize: token
+        }));
+    };
+    
+    ws.onmessage = function(msg) {
+        const data = JSON.parse(msg.data);
+        
+        if (data.msg_type === 'authorize') {
+            if (data.error) {
+                addLogEntry(`Authorization failed: ${data.error.message}`, 'error');
+                return;
+            }
+            
+            addLogEntry('Successfully authorized', 'success');
+            addLogEntry(`Welcome back, ${data.authorize.fullname}`, 'info');
+            
+            // Show trading controls
+            document.getElementById('accountInfo').style.display = 'block';
+            document.getElementById('tradingSection').style.display = 'block';
+            document.getElementById('tradingStats').style.display = 'block';
+            document.getElementById('apiForm').style.display = 'none';
+            
+            // Update account info
+            document.getElementById('accountName').textContent = data.authorize.fullname;
+            document.getElementById('accountType').textContent = data.authorize.landing_company_name;
+            
+            // Subscribe to balance
+            ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+            
+        } else if (data.msg_type === 'tick') {
+            if (isTrading) {
+                analyzePriceData(data);
+            }
+        } else if (data.msg_type === 'proposal') {
+            if (data.error) {
+                addLogEntry(`Proposal error: ${data.error.message}`, 'error');
+                return;
+            }
+            // Place trade immediately when proposal is received
+            const buy = {
+                buy: data.proposal.id,
+                price: data.proposal.ask_price
+            };
+            ws.send(JSON.stringify(buy));
+            
+        } else if (data.msg_type === 'buy') {
+            if (data.error) {
+                addLogEntry(`Buy error: ${data.error.message}`, 'error');
+                return;
+            }
+            // Store contract info for tracking
+            activeContracts.set(data.buy.contract_id, {
+                digit: data.buy.barrier,
+                type: data.buy.contract_type,
+                stake: data.buy.buy_price
+            });
+            addLogEntry(`Trade placed successfully`, 'success');
+            
+        } else if (data.msg_type === 'proposal_open_contract') {
+            const contract = data.proposal_open_contract;
+            
+            if (contract.is_sold) {
+                const contractInfo = activeContracts.get(contract.contract_id);
+                if (contractInfo) {
+                    const profit = parseFloat(contract.profit);
+                    const isWin = profit >= 0;
+                    const result = isWin ? 'WIN' : 'LOSS';
+                    const resultClass = isWin ? 'success' : 'error';
+                    
+                    // Update stats
+                    const totalTrades = parseInt(document.getElementById('totalTrades').textContent) + 1;
+                    const wins = parseInt(document.getElementById('winCount').textContent) + (isWin ? 1 : 0);
+                    const losses = parseInt(document.getElementById('lossCount').textContent) + (isWin ? 0 : 1);
+                    const profitLoss = parseFloat(document.getElementById('profitLoss').textContent) + profit;
+                    
+                    document.getElementById('totalTrades').textContent = totalTrades;
+                    document.getElementById('winCount').textContent = wins;
+                    document.getElementById('lossCount').textContent = losses;
+                    document.getElementById('profitLoss').textContent = profitLoss.toFixed(2);
+                    
+                    // Log result
+                    addLogEntry(`Trade Result: ${result} | Profit: ${profit.toFixed(2)} USD | Digit: ${contractInfo.digit}`, resultClass);
+                    
+                    // Remove from tracking
+                    activeContracts.delete(contract.contract_id);
+                }
+            }
+        } else if (data.msg_type === 'balance') {
+            if (!data.error) {
+                document.getElementById('balanceAmount').textContent = 
+                    parseFloat(data.balance.balance).toFixed(2);
+                document.getElementById('balanceCurrency').textContent = 
+                    data.balance.currency;
+            }
+        }
+    };
+});
+
+function analyzePriceData(data) {
+    const currentTime = Date.now();
+    if (currentTime - lastTradeTime < TRADE_DELAY) return;
+    
+    const lastDigit = parseInt(data.tick.quote.toString().slice(-1));
+    const patternLength = parseInt(document.getElementById('patternLength').value);
+    
+    // Add digit to history
+    lastDigits.push(lastDigit);
+    if (lastDigits.length > Math.max(5, patternLength)) {
+        lastDigits.shift();
+    }
+    
+    // Check if we should use custom pattern
+    if (patternLength > 0) {
+        const patternInputs = document.querySelectorAll('.pattern-digit');
+        const customPattern = Array.from(patternInputs).map(input => parseInt(input.value));
+        const currentPattern = lastDigits.slice(-patternLength);
+        
+        // Compare patterns
+        const patternMatch = currentPattern.every((digit, index) => digit === customPattern[index]);
+        
+        if (patternMatch) {
+            addLogEntry(`Pattern matched! Current: ${currentPattern.join('')}, Target: ${customPattern.join('')}`, 'success');
+            const tradeType = document.getElementById('tradeType').value;
+            requestProposal(tradeType, lastDigit);
+            lastTradeTime = currentTime;
+        } else {
+            addLogEntry(`Waiting for pattern... Current: ${currentPattern.join('')}, Target: ${customPattern.join('')}`, 'info');
+        }
+    } else {
+        // Normal trading without pattern
+        const tradeType = document.getElementById('tradeType').value;
+        requestProposal(tradeType, lastDigit);
+        lastTradeTime = currentTime;
+    }
+}
+
+function requestProposal(tradeType, digit) {
+    const useMartingale = document.getElementById('martingaleStrategy').checked;
+    const stake = useMartingale ? currentStake : parseFloat(document.getElementById('stakeAmount').value);
+    const market = document.getElementById('market').value;
+    
+    const proposal = {
+        proposal: 1,
+        contract_type: tradeType === 'match' ? 'DIGITMATCH' : 'DIGITDIFF',
+        currency: 'USD',
+        amount: stake.toFixed(2),
+        symbol: market,
+        barrier: digit.toString(),
+        duration: 1,
+        duration_unit: 't',
+        basis: 'stake'
+    };
+    
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        // Subscribe to contract updates
+        ws.send(JSON.stringify({
+            proposal_open_contract: 1,
+            subscribe: 1
+        }));
+        
+        ws.send(JSON.stringify(proposal));
+        addLogEntry(`Requesting ${tradeType} trade for digit ${digit} with stake $${stake.toFixed(2)}`, 'info');
+    }
+}
+
+function startTrading() {
+    isTrading = true;
+    lastTradeTime = 0;
+    document.getElementById('startBot').disabled = true;
+    document.getElementById('stopBot').disabled = false;
+    
+    // Subscribe to market ticks
+    const market = document.getElementById('market').value;
+    ws.send(JSON.stringify({
+        ticks: market,
+        subscribe: 1
+    }));
+    
+    addLogEntry('Bot started trading...', 'info');
+}
+
+function stopTrading() {
+    isTrading = false;
+    document.getElementById('startBot').disabled = false;
+    document.getElementById('stopBot').disabled = true;
+    
+    // Unsubscribe from ticks
+    ws.send(JSON.stringify({
+        forget_all: 'ticks'
+    }));
+    
+    addLogEntry('Bot stopped', 'warning');
+}
+
+// Add event listeners
+document.getElementById('startBot').addEventListener('click', startTrading);
+document.getElementById('stopBot').addEventListener('click', stopTrading);
+
+// Add log entry
+function addLogEntry(message, type = 'info') {
+    const log = document.getElementById('activityLog');
+    const time = new Date().toLocaleTimeString();
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${type}`;
+    entry.innerHTML = `[${time}] ${type.toUpperCase()} ${message}`;
+    log.insertBefore(entry, log.firstChild);
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+    }
+});
+
+// Add validation for stake amount
+document.getElementById('stakeAmount').addEventListener('change', function() {
+    let value = parseFloat(this.value);
+    if (isNaN(value) || value < 1) {
+        this.value = 1;
+    }
+});
+
+// Add event listener for target digit selection
+document.getElementById('targetDigit').addEventListener('change', function() {
+    const manualDigitDiv = document.getElementById('manualDigitDiv');
+    if (this.value === 'manual') {
+        manualDigitDiv.style.display = 'block';
+    } else {
+        manualDigitDiv.style.display = 'none';
+    }
+});
+
+// Add validation for manual digit input
+document.getElementById('manualDigit').addEventListener('input', function() {
+    let value = parseInt(this.value);
+    if (isNaN(value) || value < 0) {
+        this.value = 0;
+    } else if (value > 9) {
+        this.value = 9;
+    }
+});
+
+// Add pattern input handling
+document.getElementById('patternLength').addEventListener('change', function() {
+    const patternInputs = document.getElementById('patternInputs');
+    const patternFields = patternInputs.querySelector('.pattern-fields');
+    const length = parseInt(this.value);
+    
+    // Clear existing fields
+    patternFields.innerHTML = '';
+    
+    if (length > 0) {
+        patternInputs.style.display = 'block';
+        
+        // Create input fields based on length
+        for (let i = 0; i < length; i++) {
+            const div = document.createElement('div');
+            div.className = 'col-auto';
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'form-control pattern-digit';
+            input.min = 0;
+            input.max = 9;
+            input.value = 0;
+            input.style.width = '60px';
+            input.setAttribute('data-position', i);
+            
+            // Add validation
+            input.addEventListener('input', function() {
+                let value = parseInt(this.value);
+                if (isNaN(value) || value < 0) {
+                    this.value = 0;
+                } else if (value > 9) {
+                    this.value = 9;
+                }
+            });
+            
+            div.appendChild(input);
+            patternFields.appendChild(div);
+        }
+    } else {
+        patternInputs.style.display = 'none';
+    }
+});
+
+// Add Martingale variables
+let currentStake = 1;
+let lastTradeResult = null;
+
+// Add Martingale toggle handler
+document.getElementById('martingaleStrategy').addEventListener('change', function() {
+    const multiplierDiv = document.getElementById('martingaleMultiplierDiv');
+    multiplierDiv.style.display = this.checked ? 'block' : 'none';
+    
+    // Reset stake when toggling
+    currentStake = parseFloat(document.getElementById('stakeAmount').value);
+    addLogEntry(`Martingale ${this.checked ? 'enabled' : 'disabled'}`, 'info');
+});
+
+// Add multiplier validation
+document.getElementById('martingaleMultiplier').addEventListener('input', function() {
+    let value = parseFloat(this.value);
+    if (isNaN(value) || value < 1.1) {
+        this.value = 1.1;
+    }
+});
+
+// Update the WebSocket message handler for Martingale
+ws.onmessage = function(msg) {
+    const data = JSON.parse(msg.data);
+    
+    if (data.msg_type === 'proposal_open_contract') {
+        const contract = data.proposal_open_contract;
+        
+        if (contract.is_sold) {
+            const contractInfo = activeContracts.get(contract.contract_id);
+            if (contractInfo) {
+                const profit = parseFloat(contract.profit);
+                const isWin = profit >= 0;
+                lastTradeResult = isWin;
+                
+                // Update Martingale stake
+                if (document.getElementById('martingaleStrategy').checked) {
+                    const multiplier = parseFloat(document.getElementById('martingaleMultiplier').value);
+                    if (isWin) {
+                        // Reset stake after win
+                        currentStake = parseFloat(document.getElementById('stakeAmount').value);
+                        addLogEntry(`Win! Resetting stake to $${currentStake}`, 'success');
+                    } else {
+                        // Increase stake after loss
+                        currentStake = currentStake * multiplier;
+                        addLogEntry(`Loss! Increasing stake to $${currentStake.toFixed(2)}`, 'warning');
+                    }
+                }
+                
+                // Update stats and log results
+                updateStats(isWin, profit);
+                addLogEntry(`Trade Result: ${isWin ? 'WIN' : 'LOSS'} | Profit: ${profit.toFixed(2)} USD`, isWin ? 'success' : 'error');
+                activeContracts.delete(contract.contract_id);
+            }
+        }
+    }
+    // ... rest of your message handling
+};
+
+// Add function to update stats
+function updateStats(isWin, profit) {
+    const totalTrades = parseInt(document.getElementById('totalTrades').textContent) + 1;
+    const wins = parseInt(document.getElementById('winCount').textContent) + (isWin ? 1 : 0);
+    const losses = parseInt(document.getElementById('lossCount').textContent) + (isWin ? 0 : 1);
+    const profitLoss = parseFloat(document.getElementById('profitLoss').textContent) + profit;
+    
+    document.getElementById('totalTrades').textContent = totalTrades;
+    document.getElementById('winCount').textContent = wins;
+    document.getElementById('lossCount').textContent = losses;
+    document.getElementById('profitLoss').textContent = profitLoss.toFixed(2);
+}
+
+// Reset Martingale on bot start
+document.getElementById('startBot').addEventListener('click', function() {
+    currentStake = parseFloat(document.getElementById('stakeAmount').value);
+    lastTradeResult = null;
+    // ... rest of your start bot code
+});
+</script>
+{% endblock %} 

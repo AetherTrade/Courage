@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Admin Navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav class="nav nav-pills">
+                <a class="nav-link" href="{{ url_for('admin.admin_dashboard') }}">
+                    <i class="bx bxs-dashboard"></i> Dashboard
+                </a>
+                <a class="nav-link" href="{{ url_for('admin.admin_users') }}">
+                    <i class="bx bxs-user-detail"></i> Users
+                </a>
+                <a class="nav-link active" href="{{ url_for('admin.admin_settings') }}">
+                    <i class="bx bxs-cog"></i> Settings
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Settings Form -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">System Settings</h5>
+        </div>
+        <div class="card-body">
+            <form id="settingsForm">
+                <!-- General Settings -->
+                <h6 class="mb-3">General Settings</h6>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Site Name</label>
+                            <input type="text" class="form-control" name="site_name" 
+                                   value="{{ settings.general_settings.site_name }}">
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="maintenance_mode"
+                                       {% if settings.general_settings.maintenance_mode %}checked{% endif %}>
+                                <label class="form-check-label">Maintenance Mode</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="user_registration"
+                                       {% if settings.general_settings.user_registration %}checked{% endif %}>
+                                <label class="form-check-label">Allow User Registration</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Default Theme</label>
+                            <select class="form-select" name="default_theme">
+                                <option value="light" {% if settings.general_settings.default_theme == 'light' %}selected{% endif %}>Light</option>
+                                <option value="dark" {% if settings.general_settings.default_theme == 'dark' %}selected{% endif %}>Dark</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Settings -->
+                <h6 class="mb-3">API Settings</h6>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">API Endpoint</label>
+                            <input type="text" class="form-control" name="api_endpoint" 
+                                   value="{{ settings.api_settings.endpoint }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">API Key</label>
+                            <input type="password" class="form-control" name="api_key" 
+                                   value="{{ settings.api_settings.key }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">API Secret</label>
+                            <input type="password" class="form-control" name="api_secret" 
+                                   value="{{ settings.api_settings.secret }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">API Timeout (seconds)</label>
+                            <input type="number" class="form-control" name="api_timeout" 
+                                   value="{{ settings.api_settings.timeout }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trading Settings -->
+                <h6 class="mb-3">Trading Settings</h6>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Max Bots per User</label>
+                            <input type="number" class="form-control" name="max_bots" 
+                                   value="{{ settings.trading_settings.max_bots_per_user }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Minimum Deposit ($)</label>
+                            <input type="number" class="form-control" name="min_deposit" 
+                                   value="{{ settings.trading_settings.min_deposit }}">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Maximum Leverage</label>
+                            <input type="number" class="form-control" name="max_leverage" 
+                                   value="{{ settings.trading_settings.max_leverage }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Default Stop Loss (%)</label>
+                            <input type="number" class="form-control" name="default_stop_loss" 
+                                   value="{{ settings.trading_settings.default_stop_loss }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <h6 class="mb-3">Notification Settings</h6>
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="email_notifications"
+                                       {% if settings.notification_settings.email_notifications %}checked{% endif %}>
+                                <label class="form-check-label">Email Notifications</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="telegram_notifications"
+                                       {% if settings.notification_settings.telegram_notifications %}checked{% endif %}>
+                                <label class="form-check-label">Telegram Notifications</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Telegram Bot Token</label>
+                            <input type="password" class="form-control" name="telegram_bot_token" 
+                                   value="{{ settings.notification_settings.telegram_bot_token }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Telegram Chat ID</label>
+                            <input type="text" class="form-control" name="telegram_chat_id" 
+                                   value="{{ settings.notification_settings.telegram_chat_id }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bx bx-save"></i> Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/admin-settings.js') }}"></script>
+{% endblock %}

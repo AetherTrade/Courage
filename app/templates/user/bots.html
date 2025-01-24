@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .bot-title {
+        color: #ff3333 !important;
+    }
+    .bot-subtitle {
+        color: #ff4444 !important;
+    }
+    .feature-text {
+        color: #ff5555 !important;
+    }
+    .bot-card {
+        background: linear-gradient(145deg, rgba(26, 35, 126, 0.2), rgba(38, 50, 170, 0.2));
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    .bot-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .features {
+        color: #ffffff;
+    }
+    
+    .card-title {
+        color: #ffffff;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-right: 60px;
+    }
+    
+    .btn-primary {
+        background: #1a237e;
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background: #283593;
+    }
+    
+    .text-success {
+        color: #69f0ae !important;
+    }
+    
+    .bot-icon {
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #1a237e, #3f51b5);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: rotate(45deg);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .bot-icon i {
+        font-size: 2rem;
+        color: white;
+        transform: rotate(-45deg);
+    }
+    
+    .status-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: rgba(105, 240, 174, 0.2);
+        color: #69f0ae;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .text-accent {
+        color: #69f0ae;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+        color: #ffffff;
+        font-size: 0.95rem;
+    }
+    
+    .feature-item i {
+        font-size: 1.25rem;
+        color: #69f0ae;
+    }
+    
+    .btn-glow {
+        background: linear-gradient(45deg, #1a237e, #3f51b5);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-glow:hover {
+        background: linear-gradient(45deg, #3f51b5, #1a237e);
+        box-shadow: 0 0 20px rgba(63, 81, 181, 0.4);
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .features {
+        margin-right: 60px;
+    }
+    
+    /* Add animation for cards */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .bot-card {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .bot-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .bot-card:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4 text-white fw-bold">
+        <i class="bx bx-bot me-2"></i>Trading Bots
+    </h2>
+    
+    <div class="row g-4">
+        <!-- Trend Warrior Bot Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 bot-card">
+                <div class="card-body position-relative p-4">
+                    <div class="bot-icon">
+                        <i class="bx bx-trending-up"></i>
+                    </div>
+                    <span class="status-badge">Active</span>
+                    
+                    <h3 class="card-title mb-2">CourageFX Trend Warrior</h3>
+                    <p class="text-accent mb-4">Rise/Fall Market Expert</p>
+                    
+                    <div class="features mb-4">
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Trend direction analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Multiple timeframe strategy</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Dynamic entry points</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Automated trend following</span>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('user.precision_master') }}" class="btn btn-glow w-100">
+                        <i class="bx bx-trending-up me-2"></i> Launch Trend Warrior
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Precision Master Bot Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 bot-card">
+                <div class="card-body position-relative p-4">
+                    <div class="bot-icon">
+                        <i class="bx bx-target-lock"></i>
+                    </div>
+                    <span class="status-badge">Active</span>
+                    
+                    <h3 class="card-title mb-2">CourageFX Precision Master</h3>
+                    <p class="text-accent mb-4">Over/Under Market Specialist</p>
+                    
+                    <div class="features mb-4">
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Advanced over/under predictions</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Market momentum analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Risk management system</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Real-time market scanning</span>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('user.trend_warrior') }}" class="btn btn-glow w-100">
+                        <i class="bx bx-target-lock me-2"></i> Launch Precision Master
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pattern Hunter Bot Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 bot-card">
+                <div class="card-body position-relative p-4">
+                    <div class="bot-icon">
+                        <i class="bx bx-radar"></i>
+                    </div>
+                    <span class="status-badge">Active</span>
+                    
+                    <h3 class="card-title mb-2">CourageFX Pattern Hunter</h3>
+                    <p class="text-accent mb-4">Pattern Recognition Expert</p>
+                    
+                    <div class="features mb-4">
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Advanced pattern recognition</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Multi-pattern analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Entry/exit optimization</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-check-circle text-success"></i>
+                            <span>Real-time pattern alerts</span>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('user.pattern_hunter') }}" class="btn btn-glow w-100">
+                        <i class="bx bx-radar me-2"></i> Launch Pattern Hunter
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Active Bots</h2>
+    </div>
+
+    <!-- Active Bots Section -->
+    <div class="row">
+        {% for bot in bots %}
+        <div class="col-12 col-md-6 col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">{{ bot.name }}</h5>
+                        <span class="badge bg-{{ 'success' if bot.is_active else 'danger' }}">
+                            {{ 'Active' if bot.is_active else 'Inactive' }}
+                        </span>
+                    </div>
+                    <p class="card-text">Strategy: {{ bot.strategy }}</p>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="p-2 border rounded">
+                                <small class="d-block text-muted">Initial Investment</small>
+                                <strong>${{ "%.2f"|format(bot.initial_investment) }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 border rounded">
+                                <small class="d-block text-muted">Current Profit</small>
+                                <strong class="text-{{ 'success' if bot.profit >= 0 else 'danger' }}">
+                                    ${{ "%.2f"|format(bot.profit) }}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="p-2 border rounded">
+                                <small class="d-block text-muted">Win Rate</small>
+                                <strong>{{ bot.win_rate }}%</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 border rounded">
+                                <small class="d-block text-muted">Total Trades</small>
+                                <strong>{{ bot.total_trades }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-primary" onclick="viewBotDetails({{ bot.id }})">
+                            <i class="bx bx-show"></i> Details
+                        </button>
+                        {% if bot.is_active %}
+                        <button class="btn btn-danger" onclick="stopBot({{ bot.id }})">
+                            <i class="bx bx-stop-circle"></i> Stop
+                        </button>
+                        {% else %}
+                        <button class="btn btn-success" onclick="startBot({{ bot.id }})">
+                            <i class="bx bx-play-circle"></i> Start
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setStrategy(strategy) {
+    document.getElementById('strategy').value = strategy;
+    let defaultNames = {
+        'OVER_UNDER': 'CourageFX Precision Master',
+        'RISE_FALL': 'CourageFX Trend Warrior',
+        'PATTERN': 'CourageFX Pattern Hunter'
+    };
+    document.getElementById('botName').value = defaultNames[strategy];
+}
+
+// ... rest of your existing JavaScript ...
+</script>
+<script src="{{ url_for('static', filename='js/bots.js') }}"></script>
+{% endblock %} 

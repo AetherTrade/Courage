@@ -1,0 +1,751 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- API Connection Card -->
+            <div class="card api-card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">CourageFX Over/Under Expert</h3>
+                    <p class="text-muted">Digital Options Specialist</p>
+                    
+                    <div class="features mb-4">
+                        <div><i class="bx bx-check text-success"></i> Last Digit Prediction</div>
+                        <div><i class="bx bx-check text-success"></i> Smart Recovery System</div>
+                        <div><i class="bx bx-check text-success"></i> Automated Over/Under Trading</div>
+                        <div><i class="bx bx-check text-success"></i> Advanced Loss Recovery</div>
+                    </div>
+                    
+                    <form id="apiForm">
+                        <div class="mb-3">
+                            <label class="form-label">Deriv API Token</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="apiToken" required>
+                                <button class="btn btn-outline-secondary" type="button" id="toggleToken">
+                                    <i class="bx bx-show"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                Get your API token from <a href="https://app.deriv.com/account/api-token" target="_blank">Deriv</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="connectBtn">
+                            <i class="bx bx-link"></i>
+                            <span class="loading-spinner spinner-border spinner-border-sm"></span>
+                            Connect
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Info Card -->
+            <div class="card api-card mb-4" id="accountInfo" style="display: none;">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-1" id="accountName">-</h5>
+                            <p class="text-muted mb-0" id="accountType">-</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="balance-card p-3 rounded">
+                                <div class="balance-value" id="balanceAmount">0.00</div>
+                                <div class="currency" id="balanceCurrency">USD</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-danger mt-3" id="disconnectBtn">
+                        <i class="bx bx-log-out"></i> Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trading Controls -->
+            <div class="card api-card mb-4" id="tradingSection" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Over/Under Trading Bot</h5>
+                    
+                    <div class="trading-controls">
+                        <div class="trade-params">
+                            <!-- Market Selection -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Market</label>
+                                    <select class="form-control" id="market">
+                                        <optgroup label="1 Second Volatility">
+                                            <option value="1HZ10V">Volatility 10 (1s)</option>
+                                            <option value="1HZ25V">Volatility 25 (1s)</option>
+                                            <option value="1HZ50V">Volatility 50 (1s)</option>
+                                            <option value="1HZ75V">Volatility 75 (1s)</option>
+                                            <option value="1HZ100V">Volatility 100 (1s)</option>
+                                        </optgroup>
+                                        <optgroup label="Standard Volatility">
+                                            <option value="R_10">Volatility 10</option>
+                                            <option value="R_25">Volatility 25</option>
+                                            <option value="R_50">Volatility 50</option>
+                                            <option value="R_75">Volatility 75</option>
+                                            <option value="R_100">Volatility 100</option>
+                                        </optgroup>
+                                        <optgroup label="Crash/Boom">
+                                            <option value="CRASH_1000">Crash 1000</option>
+                                            <option value="BOOM_1000">Boom 1000</option>
+                                            <option value="CRASH_500">Crash 500</option>
+                                            <option value="BOOM_500">Boom 500</option>
+                                        </optgroup>
+                                        <optgroup label="Standard Markets">
+                                            <option value="R_10">Volatility 10 Index</option>
+                                            <option value="R_25">Volatility 25 Index</option>
+                                            <option value="R_50">Volatility 50 Index</option>
+                                            <option value="R_75">Volatility 75 Index</option>
+                                            <option value="R_100">Volatility 100 Index</option>
+                                            <option value="RDBEAR">Bear Market Index</option>
+                                            <option value="RDBULL">Bull Market Index</option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="form-text text-white-50">
+                                        Select market type and volatility level
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trade Type and Barrier -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Trade Type</label>
+                                    <select class="form-control" id="tradingStrategy">
+                                        <option value="over">Goes Over</option>
+                                        <option value="under">Goes Under</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Barrier</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="barrierOffset" value="0" step="0.1">
+                                        <button class="btn btn-outline-secondary" type="button" id="addTick">+</button>
+                                        <button class="btn btn-outline-secondary" type="button" id="subTick">-</button>
+                                    </div>
+                                    <small class="form-text text-muted">Current spot: <span id="currentSpot">0.00</span></small>
+                                </div>
+                            </div>
+
+                            <!-- Duration -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Duration</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="duration" value="1" min="1">
+                                        <select class="form-select" id="durationType" style="max-width: 110px;">
+                                            <option value="t">Tick</option>
+                                            <option value="s">Second</option>
+                                            <option value="m">Minute</option>
+                                            <option value="h">Hour</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Stake</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="stakeAmount" value="10" min="0.35" step="0.01">
+                                        <span class="input-group-text" id="stakeCurrency">USD</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payout Display -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="payout-info p-3 rounded bg-light">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Potential Payout:</span>
+                                            <span id="potentialPayout">0.00 USD</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Payout Limit:</span>
+                                            <span>20000.00 USD</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Add these fields right after the barrier offset field -->
+                            <div class="form-group mb-3">
+                                <label for="barrierOffset">Barrier Offset</label>
+                                <input type="number" class="form-control" id="barrierOffset" value="0" min="0" max="9">
+                            </div>
+
+                            <!-- Add these new fields here -->
+                            <div class="form-group mb-3">
+                                <label for="recoveryBarrier" class="text-warning">Recovery Barrier</label>
+                                <input type="number" class="form-control" id="recoveryBarrier" value="5" min="0" max="9" 
+                                       placeholder="Enter recovery barrier (0-9)">
+                                <small class="form-text text-muted">Barrier to use after a loss</small>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="recoveryStrategy" class="text-warning">Recovery Strategy</label>
+                                <select class="form-control" id="recoveryStrategy">
+                                    <option value="over">Over</option>
+                                    <option value="under">Under</option>
+                                </select>
+                                <small class="form-text text-muted">Strategy to use for recovery trades</small>
+                            </div>
+
+                            <!-- Trading Buttons -->
+                            <div class="d-flex justify-content-between gap-3">
+                                <button class="btn btn-success flex-grow-1 py-3" id="startBot">
+                                    <i class="bx bx-trending-up me-2"></i>
+                                    <span>Start Auto-Trading</span>
+                                    <div class="potential-return" id="buyReturn">0.00</div>
+                                </button>
+                                <button class="btn btn-danger flex-grow-1 py-3" id="stopBot" disabled>
+                                    <i class="bx bx-stop-circle me-2"></i>
+                                    <span>Stop Trading</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add this inside the trading controls card, before the activity log -->
+            <div class="card api-card mb-4" id="tradingStats" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Trading Statistics</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Total Trades</label>
+                                <div class="stat-value" id="totalTrades">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Wins</label>
+                                <div class="stat-value text-success" id="winCount">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Losses</label>
+                                <div class="stat-value text-danger" id="lossCount">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Profit/Loss</label>
+                                <div class="stat-value" id="profitLoss">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="card api-card">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Activity Log</h5>
+                    <div class="activity-log" id="activityLog"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Keep existing styles and JavaScript -->
+<script>
+// Initialize variables
+let ws = null;
+let isTrading = false;
+let currentContract = null;
+let tradeTimeout = null;
+const tradingStats = {
+    totalTrades: 0,
+    wins: 0,
+    losses: 0,
+    profitLoss: 0
+};
+
+// Constants for predictions
+const PREDICTIONS = {
+    OVER: 'DIGITOVER',
+    UNDER: 'DIGITUNDER'
+};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for stored API token
+    const storedToken = localStorage.getItem('deriv_api_token');
+    if (storedToken) {
+        document.getElementById('apiToken').value = storedToken;
+        // Auto-connect if token exists
+        document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+    }
+    addLogEntry('Bot initialized and ready to connect', 'info');
+});
+
+// Toggle API token visibility
+document.getElementById('toggleToken').addEventListener('click', function() {
+    const apiToken = document.getElementById('apiToken');
+    const icon = this.querySelector('i');
+    if (apiToken.type === 'password') {
+        apiToken.type = 'text';
+        icon.classList.replace('bx-show', 'bx-hide');
+    } else {
+        apiToken.type = 'password';
+        icon.classList.replace('bx-hide', 'bx-show');
+    }
+});
+
+// WebSocket message handler
+function handleMessage(msg) {
+    const data = JSON.parse(msg.data);
+    
+    switch(data.msg_type) {
+        case 'authorize':
+            handleAuth(data);
+            break;
+        case 'balance':
+            handleBalance(data);
+            break;
+        case 'proposal':
+            handleProposal(data);
+            break;
+        case 'buy':
+            handleBuy(data);
+            break;
+        case 'proposal_open_contract':
+            handleContract(data);
+            break;
+    }
+}
+
+function handleAuth(data) {
+    if (data.error) return;
+    addLogEntry('Successfully authorized', 'success');
+    addLogEntry(`Welcome back, ${data.authorize.fullname}`, 'info');
+    
+    document.getElementById('accountName').textContent = data.authorize.fullname;
+    document.getElementById('accountType').textContent = 
+        data.authorize.landing_company_name.toUpperCase();
+    document.getElementById('tradingSection').style.display = 'block';
+    
+    ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+}
+
+function handleBalance(data) {
+    if (data.error) return;
+    const balance = parseFloat(data.balance.balance).toFixed(2);
+    const currency = data.balance.currency;
+    
+    addLogEntry(`Account balance: ${balance} ${currency}`, 'success');
+    
+    document.getElementById('balanceAmount').textContent = balance;
+    document.getElementById('balanceCurrency').textContent = currency;
+    document.getElementById('stakeCurrency').textContent = currency;
+    document.getElementById('accountInfo').style.display = 'block';
+    document.getElementById('apiForm').style.display = 'none';
+}
+
+function handleProposal(data) {
+    if (data.error) {
+        addLogEntry(`Proposal error: ${data.error.message}`, 'error');
+        if (isTrading) continueTradingLoop();
+        return;
+    }
+    
+    document.getElementById('potentialPayout').textContent = 
+        `${parseFloat(data.proposal.payout).toFixed(2)} USD`;
+    document.getElementById('buyReturn').textContent = 
+        `Return: ${parseFloat(data.proposal.payout - data.proposal.ask_price).toFixed(2)} USD`;
+    
+    if (isTrading && !currentContract) {
+        ws.send(JSON.stringify({
+            buy: data.proposal.id,
+            price: data.proposal.ask_price
+        }));
+    }
+}
+
+function handleBuy(data) {
+    if (data.error) {
+        addLogEntry(`Trade error: ${data.error.message}`, 'error');
+        currentContract = null;
+        if (isTrading) continueTradingLoop();
+        return;
+    }
+    
+    currentContract = data.buy.contract_id;
+    addLogEntry(`Trade placed: ${data.buy.longcode}`, 'success');
+    
+    ws.send(JSON.stringify({
+        proposal_open_contract: 1,
+        contract_id: currentContract,
+        subscribe: 1
+    }));
+}
+
+function handleContract(data) {
+    if (data.error) return;
+    
+    const contract = data.proposal_open_contract;
+    
+    if (contract.is_sold) {
+        const profit = parseFloat(contract.profit);
+        tradingStats.totalTrades++;
+        
+        if (profit > 0) {
+            tradingStats.wins++;
+            addLogEntry(`Trade won: +${profit} USD`, 'success');
+            
+            // Reset to original strategy on win
+            document.getElementById('tradingStrategy').disabled = false;
+            document.getElementById('barrierOffset').disabled = false;
+            
+            // Unsubscribe from current contract
+            ws.send(JSON.stringify({ forget: contract.id }));
+            currentContract = null;
+            
+            // Continue trading on win
+            addLogEntry('Won! Continuing with original strategy...', 'info');
+            if (tradeTimeout) {
+                clearTimeout(tradeTimeout);
+            }
+            
+            setTimeout(() => {
+                if (isTrading) {
+                    placeTrade();
+                }
+            }, 1000);
+            
+        } else {
+            tradingStats.losses++;
+            addLogEntry(`Trade lost: ${profit} USD`, 'error');
+            
+            // Switch to recovery strategy
+            const recoveryBarrier = document.getElementById('recoveryBarrier').value;
+            const recoveryStrategy = document.getElementById('recoveryStrategy').value;
+            
+            // Lock original strategy controls during recovery
+            document.getElementById('tradingStrategy').disabled = true;
+            document.getElementById('barrierOffset').disabled = true;
+            
+            addLogEntry(`Switching to recovery mode: ${recoveryStrategy.toUpperCase()} ${recoveryBarrier}`, 'warning');
+            
+            // Unsubscribe from current contract
+            ws.send(JSON.stringify({ forget: contract.id }));
+            currentContract = null;
+            
+            // Continue with recovery trade
+            setTimeout(() => {
+                if (isTrading) {
+                    placeRecoveryTrade();
+                }
+            }, 1000);
+        }
+        
+        tradingStats.profitLoss += profit;
+        updateStats();
+    }
+}
+
+function continueTradingLoop() {
+    if (!isTrading) return;
+    
+    if (tradeTimeout) {
+        clearTimeout(tradeTimeout);
+    }
+    
+    tradeTimeout = setTimeout(() => {
+        if (isTrading && !currentContract) {
+            placeTrade();
+        }
+    }, 1000);
+}
+
+function placeTrade() {
+    if (!isTrading || currentContract) return;
+    
+    const market = document.getElementById('market').value;
+    const stake = document.getElementById('stakeAmount').value;
+    const duration = document.getElementById('duration').value;
+    const durationType = document.getElementById('durationType').value;
+    const strategy = document.getElementById('tradingStrategy').value;
+    
+    const proposalRequest = {
+        proposal: 1,
+        amount: parseFloat(stake),
+        basis: 'stake',
+        contract_type: strategy === 'over' ? 'DIGITOVER' : 'DIGITUNDER',
+        currency: 'USD',
+        symbol: market,
+        duration: parseInt(duration),
+        duration_unit: durationType,
+        barrier: 0  // Always use 0 for initial trades
+    };
+    
+    addLogEntry(`Requesting ${strategy.toUpperCase()} trade with barrier 0...`, 'info');
+    ws.send(JSON.stringify(proposalRequest));
+}
+
+// Add new function for recovery trades
+function placeRecoveryTrade() {
+    if (!isTrading || currentContract) return;
+    
+    const market = document.getElementById('market').value;
+    const stake = document.getElementById('stakeAmount').value;
+    const duration = document.getElementById('duration').value;
+    const durationType = document.getElementById('durationType').value;
+    const recoveryBarrier = document.getElementById('recoveryBarrier').value;
+    const recoveryStrategy = document.getElementById('recoveryStrategy').value;
+    
+    const proposalRequest = {
+        proposal: 1,
+        amount: parseFloat(stake),
+        basis: 'stake',
+        contract_type: recoveryStrategy === 'over' ? 'DIGITOVER' : 'DIGITUNDER',
+        currency: 'USD',
+        symbol: market,
+        duration: parseInt(duration),
+        duration_unit: durationType,
+        barrier: parseInt(recoveryBarrier)  // Use recovery barrier for recovery trades
+    };
+    
+    addLogEntry(`Requesting recovery trade: ${recoveryStrategy.toUpperCase()} ${recoveryBarrier}...`, 'info');
+    ws.send(JSON.stringify(proposalRequest));
+}
+
+// Initialize WebSocket connection
+document.getElementById('apiForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const token = document.getElementById('apiToken').value;
+    
+    ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1089');
+    ws.onmessage = handleMessage;
+    
+    ws.onopen = function() {
+        addLogEntry('WebSocket connection established', 'success');
+        ws.send(JSON.stringify({ authorize: token }));
+    };
+});
+
+// Start trading button
+document.getElementById('startBot').addEventListener('click', function() {
+    isTrading = true;
+    currentContract = null;
+    this.disabled = true;
+    document.getElementById('stopBot').disabled = false;
+    document.getElementById('tradingStrategy').disabled = false;
+    document.getElementById('barrierOffset').disabled = false;
+    addLogEntry('Starting new trading cycle', 'success');
+    placeTrade();
+});
+
+// Stop trading button
+document.getElementById('stopBot').addEventListener('click', function() {
+    isTrading = false;
+    this.disabled = true;
+    document.getElementById('startBot').disabled = false;
+    
+    if (tradeTimeout) {
+        clearTimeout(tradeTimeout);
+        tradeTimeout = null;
+    }
+    
+    if (currentContract) {
+        ws.send(JSON.stringify({ forget: currentContract }));
+        currentContract = null;
+    }
+    
+    addLogEntry('Bot manually stopped trading', 'warning');
+});
+
+// Update statistics display
+function updateStats() {
+    const statsDiv = document.getElementById('tradingStats');
+    if (statsDiv) {
+        statsDiv.style.display = 'block';
+    }
+    
+    const elements = {
+        totalTrades: document.getElementById('totalTrades'),
+        winCount: document.getElementById('winCount'),
+        lossCount: document.getElementById('lossCount'),
+        profitLoss: document.getElementById('profitLoss')
+    };
+    
+    // Safely update stats
+    if (elements.totalTrades) elements.totalTrades.textContent = tradingStats.totalTrades;
+    if (elements.winCount) elements.winCount.textContent = tradingStats.wins;
+    if (elements.lossCount) elements.lossCount.textContent = tradingStats.losses;
+    if (elements.profitLoss) {
+        elements.profitLoss.textContent = tradingStats.profitLoss.toFixed(2);
+        elements.profitLoss.classList.remove('text-success', 'text-danger');
+        elements.profitLoss.classList.add(tradingStats.profitLoss >= 0 ? 'text-success' : 'text-danger');
+    }
+}
+
+// Add log entry
+function addLogEntry(message, type = 'info') {
+    const log = document.getElementById('activityLog');
+    const time = new Date().toLocaleTimeString();
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${type}`;
+    entry.innerHTML = `[${time}] ${type.toUpperCase()} ${message}`;
+    log.insertBefore(entry, log.firstChild);
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+    }
+});
+
+// Add some styles
+const styles = `
+    .stat-item {
+        text-align: center;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .stat-item label {
+        font-size: 0.9rem;
+        color: #888;
+        margin-bottom: 5px;
+    }
+    
+    .stat-item .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    
+    .text-success { color: #69f0ae !important; }
+    .text-danger { color: #ff5252 !important; }
+`;
+
+// Add styles to document
+const styleSheet = document.createElement("style");
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
+</script>
+
+<style>
+    /* Add these styles */
+    .card-title, 
+    .text-muted, 
+    .features, 
+    label, 
+    .form-text,
+    .stat-value,
+    .balance-value,
+    .currency,
+    .activity-log,
+    #accountName,
+    #accountType,
+    #potentialPayout,
+    #buyReturn {
+        color: white !important;
+    }
+    
+    .text-muted {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    .form-control,
+    .form-select {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        background-color: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* Keep success and error colors */
+    .text-success {
+        color: #69f0ae !important;
+    }
+    
+    .text-danger {
+        color: #ff5252 !important;
+    }
+    
+    .text-warning {
+        color: #ffd740 !important;
+    }
+    
+    /* Style small helper text */
+    .form-text {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+    
+    /* Style select dropdowns */
+    select option {
+        background-color: #2c2c2c;
+        color: white;
+    }
+
+    /* Keep existing styles and add activity log specific styles */
+    .activity-log {
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    .log-entry {
+        margin-bottom: 5px;
+        padding: 5px;
+        border-radius: 4px;
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Log entry types */
+    .log-entry.info {
+        color: #8be9fd !important;
+    }
+
+    .log-entry.success {
+        color: #50fa7b !important;
+    }
+
+    .log-entry.warning {
+        color: #ffb86c !important;
+    }
+
+    .log-entry.error {
+        color: #ff5555 !important;
+    }
+
+    /* Scrollbar styling */
+    .activity-log::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .activity-log::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+    }
+
+    .activity-log::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+    }
+
+    .activity-log::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+</style>
+{% endblock %} 

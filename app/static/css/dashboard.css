@@ -1,0 +1,149 @@
+/* Dashboard specific styles */
+
+/* Stats Cards */
+.stats-card {
+    border-radius: 15px;
+    padding: 1.5rem;
+    height: 100%;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stats-card .card-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card .card-text {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+/* Trading Chart */
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin: 20px 0;
+}
+
+/* Bot Cards */
+.bot-card {
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.bot-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.bot-card .bot-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.bot-card .bot-status.active {
+    background-color: var(--success-color);
+}
+
+.bot-card .bot-status.inactive {
+    background-color: var(--danger-color);
+}
+
+/* Trading History Table */
+.trading-history {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.trading-history th {
+    font-weight: 600;
+    color: #495057;
+}
+
+.profit-positive {
+    color: var(--success-color);
+}
+
+.profit-negative {
+    color: var(--danger-color);
+}
+
+/* Bot Controls */
+.bot-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.bot-controls button {
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* Performance Metrics */
+.performance-metric {
+    padding: 15px;
+    border-radius: 10px;
+    background: white;
+    margin-bottom: 15px;
+}
+
+.performance-metric h4 {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.performance-metric .value {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .stats-card {
+        min-height: 120px;
+    }
+
+    .chart-container {
+        height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-card {
+        min-height: 100px;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+}
+
+/* Trading Indicators */
+.indicator {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.indicator-up {
+    background-color: rgba(46, 125, 50, 0.1);
+    color: var(--success-color);
+}
+
+.indicator-down {
+    background-color: rgba(198, 40, 40, 0.1);
+    color: var(--danger-color);
+}
