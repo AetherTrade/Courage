@@ -7,15 +7,14 @@
             <!-- API Connection Card -->
             <div class="card api-card mb-4">
                 <div class="card-body">
-                    <h3 class="card-title">CourageFX Over/Under Expert</h3>
-                    <p class="text-muted">Digital Options Specialist</p>
+                    <h3 class="card-title">CourageFX Precision Master</h3>
+                    <p class="text-muted">Rise/Fall Market Expert</p>
                     
                     <div class="features mb-4">
-                        <div><i class="bx bx-check text-success"></i> Last Digit Prediction</div>
-                        <div><i class="bx bx-check text-success"></i> Smart Recovery System</div>
-                        <div><i class="bx bx-check text-success"></i> Automated Over/Under Trading</div>
-                        <div><i class="bx bx-check text-success"></i> Advanced Loss Recovery</div>
-                    </div>
+                        <div><i class="bx bx-check text-success"></i> Trend direction analysis</div>
+                        <div><i class="bx bx-check text-success"></i> Multiple timeframe strategy</div>
+                        <div><i class="bx bx-check text-success"></i> Dynamic entry points</div>
+                        <div><i class="bx bx-check text-success"></i> Automated trend following</div>
                     
                     <form id="apiForm">
                         <div class="mb-3">
@@ -60,13 +59,46 @@
                 </div>
             </div>
 
+            <!-- Activity Log -->
+            <div class="card api-card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Activity Log</h5>
+                    <div class="activity-log" id="activityLog"></div>
+                </div>
+            </div>
+
             <!-- Trading Controls -->
             <div class="card api-card mb-4" id="tradingSection" style="display: none;">
                 <div class="card-body">
-                    <h5 class="card-title mb-4">Over/Under Trading Bot</h5>
+                    <h5 class="card-title mb-4">Precision Master Trading Bot</h5>
                     
                     <div class="trading-controls">
                         <div class="trade-params">
+                            <!-- Barrier input -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Barrier Digit</label>
+                                    <input type="number" 
+                                           class="form-control" 
+                                           id="targetDigit" 
+                                           min="0" 
+                                           max="9" 
+                                           step="1" 
+                                           value="0"
+                                           placeholder="Enter digit (0-9)">
+                                    <div class="form-text">Enter any digit between 0 and 9</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Prediction</label>
+                                    <select class="form-control" id="digitPrediction">
+                                        <option value="over">Over</option>
+                                        <option value="under">Under</option>
+                                        <option value="matches">Matches</option>
+                                        <option value="differs">Differs</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <!-- Market Selection -->
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -190,6 +222,23 @@
                                 <small class="form-text text-muted">Strategy to use for recovery trades</small>
                             </div>
 
+                            <!-- Add after the first recovery barrier -->
+                            <div class="form-group mb-3">
+                                <label for="secondaryRecoveryBarrier" class="text-warning">Secondary Recovery Barrier</label>
+                                <input type="number" class="form-control" id="secondaryRecoveryBarrier" value="7" min="0" max="9" 
+                                       placeholder="Enter secondary recovery barrier (0-9)">
+                                <small class="form-text text-muted">Barrier to use if first recovery trade loses</small>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="secondaryRecoveryStrategy" class="text-warning">Secondary Recovery Strategy</label>
+                                <select class="form-control" id="secondaryRecoveryStrategy">
+                                    <option value="over">Over</option>
+                                    <option value="under">Under</option>
+                                </select>
+                                <small class="form-text text-muted">Strategy to use for secondary recovery trades</small>
+                            </div>
+
                             <!-- Trading Buttons -->
                             <div class="d-flex justify-content-between gap-3">
                                 <button class="btn btn-success flex-grow-1 py-3" id="startBot">
@@ -207,10 +256,15 @@
                 </div>
             </div>
 
-            <!-- Add this inside the trading controls card, before the activity log -->
+            <!-- Moved Trading Stats here -->
             <div class="card api-card mb-4" id="tradingStats" style="display: none;">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">Trading Statistics</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Trading Statistics</h5>
+                        <button class="btn btn-outline-warning btn-sm" id="refreshStats">
+                            <i class="bx bx-refresh me-1"></i>Reset Stats
+                        </button>
+                    </div>
                     <div class="row">
                         <div class="col-md-3">
                             <div class="stat-item">
@@ -240,13 +294,26 @@
                 </div>
             </div>
 
-            <!-- Activity Log -->
-            <div class="card api-card">
+            <!-- Market Info Card -->
+            <div class="card api-card mb-4" id="marketInfo" style="display: none;">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">Activity Log</h5>
-                    <div class="activity-log" id="activityLog"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="market-stat">
+                                <label>Current Price</label>
+                                <div class="stat-value" id="currentPrice">0.00000</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="market-stat">
+                                <label>Last Digit</label>
+                                <div class="stat-value digit-display" id="lastDigit">0</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -264,12 +331,7 @@ const tradingStats = {
     losses: 0,
     profitLoss: 0
 };
-
-// Constants for predictions
-const PREDICTIONS = {
-    OVER: 'DIGITOVER',
-    UNDER: 'DIGITUNDER'
-};
+let lastPrice = 0;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -300,6 +362,8 @@ document.getElementById('toggleToken').addEventListener('click', function() {
 function handleMessage(msg) {
     const data = JSON.parse(msg.data);
     
+    console.log('Received message:', data);
+    
     switch(data.msg_type) {
         case 'authorize':
             handleAuth(data);
@@ -316,6 +380,12 @@ function handleMessage(msg) {
         case 'proposal_open_contract':
             handleContract(data);
             break;
+        case 'tick':
+            handleTick(data.tick);
+            break;
+        case 'error':
+            handleError(data);
+            break;
     }
 }
 
@@ -328,8 +398,11 @@ function handleAuth(data) {
     document.getElementById('accountType').textContent = 
         data.authorize.landing_company_name.toUpperCase();
     document.getElementById('tradingSection').style.display = 'block';
+    document.getElementById('marketInfo').style.display = 'block';
     
+    // Subscribe to balance and market ticks
     ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+    subscribeToTicks();
 }
 
 function handleBalance(data) {
@@ -349,37 +422,46 @@ function handleBalance(data) {
 function handleProposal(data) {
     if (data.error) {
         addLogEntry(`Proposal error: ${data.error.message}`, 'error');
-        if (isTrading) continueTradingLoop();
         return;
     }
     
-    document.getElementById('potentialPayout').textContent = 
-        `${parseFloat(data.proposal.payout).toFixed(2)} USD`;
-    document.getElementById('buyReturn').textContent = 
-        `Return: ${parseFloat(data.proposal.payout - data.proposal.ask_price).toFixed(2)} USD`;
-    
-    if (isTrading && !currentContract) {
-        ws.send(JSON.stringify({
+    if (data.proposal && data.proposal.id) {
+        const buyRequest = {
             buy: data.proposal.id,
             price: data.proposal.ask_price
-        }));
+        };
+        
+        console.log('Sending buy request:', buyRequest);
+        addLogEntry(`Placing trade with proposal ID: ${data.proposal.id}`, 'info');
+        ws.send(JSON.stringify(buyRequest));
     }
 }
 
 function handleBuy(data) {
     if (data.error) {
         addLogEntry(`Trade error: ${data.error.message}`, 'error');
-        currentContract = null;
-        if (isTrading) continueTradingLoop();
+        
+        // Retry trade after error
+        setTimeout(() => {
+            if (isTrading) {
+                addLogEntry('Retrying trade after error...', 'info');
+                placeTrade();
+            }
+        }, 1000);
         return;
     }
     
-    currentContract = data.buy.contract_id;
-    addLogEntry(`Trade placed: ${data.buy.longcode}`, 'success');
+    const contract = data.buy;
+    currentContract = contract.contract_id;
     
+    addLogEntry(`Trade placed successfully: ${contract.longcode}`, 'success');
+    addLogEntry(`Contract ID: ${contract.contract_id}`, 'info');
+    
+    
+    // Subscribe to contract updates
     ws.send(JSON.stringify({
         proposal_open_contract: 1,
-        contract_id: currentContract,
+        contract_id: contract.contract_id,
         subscribe: 1
     }));
 }
@@ -390,27 +472,42 @@ function handleContract(data) {
     const contract = data.proposal_open_contract;
     
     if (contract.is_sold) {
-        const profit = parseFloat(contract.profit);
+        const profit = parseFloat(contract.profit).toFixed(2);
         tradingStats.totalTrades++;
         
-        if (profit > 0) {
+        if (parseFloat(profit) > 0) {
             tradingStats.wins++;
             addLogEntry(`Trade won: +${profit} USD`, 'success');
+            // Update total profit/loss
+            tradingStats.profitLoss = (parseFloat(tradingStats.profitLoss) + parseFloat(profit)).toFixed(2);
             
-            // Reset to original strategy on win
-            document.getElementById('tradingStrategy').disabled = false;
-            document.getElementById('barrierOffset').disabled = false;
+            // Check which strategy was active
+            const isRecoveryTrade = document.getElementById('tradingStrategy').disabled;
+            const isSecondaryRecoveryTrade = document.getElementById('secondaryRecoveryBarrier').disabled;
+            
+            if (isSecondaryRecoveryTrade) {
+                // If secondary recovery won, switch back to initial strategy
+                document.getElementById('tradingStrategy').disabled = false;
+                document.getElementById('barrierOffset').disabled = false;
+                document.getElementById('recoveryBarrier').disabled = false;
+                document.getElementById('recoveryStrategy').disabled = false;
+                document.getElementById('secondaryRecoveryBarrier').disabled = false;
+                document.getElementById('secondaryRecoveryStrategy').disabled = false;
+                
+                addLogEntry('Secondary recovery won! Switching back to initial strategy...', 'success');
+            } else if (isRecoveryTrade) {
+                // If primary recovery won, switch back to initial strategy
+                document.getElementById('tradingStrategy').disabled = false;
+                document.getElementById('barrierOffset').disabled = false;
+                
+                addLogEntry('Recovery trade won! Switching back to initial strategy...', 'success');
+            }
             
             // Unsubscribe from current contract
             ws.send(JSON.stringify({ forget: contract.id }));
             currentContract = null;
             
-            // Continue trading on win
-            addLogEntry('Won! Continuing with original strategy...', 'info');
-            if (tradeTimeout) {
-                clearTimeout(tradeTimeout);
-            }
-            
+            // Continue trading
             setTimeout(() => {
                 if (isTrading) {
                     placeTrade();
@@ -420,30 +517,70 @@ function handleContract(data) {
         } else {
             tradingStats.losses++;
             addLogEntry(`Trade lost: ${profit} USD`, 'error');
+            // Update total profit/loss
+            tradingStats.profitLoss = (parseFloat(tradingStats.profitLoss) + parseFloat(profit)).toFixed(2);
             
-            // Switch to recovery strategy
-            const recoveryBarrier = document.getElementById('recoveryBarrier').value;
-            const recoveryStrategy = document.getElementById('recoveryStrategy').value;
+            // Check which strategy was active
+            const isRecoveryTrade = document.getElementById('tradingStrategy').disabled;
+            const isSecondaryRecoveryTrade = document.getElementById('secondaryRecoveryBarrier').disabled;
             
-            // Lock original strategy controls during recovery
-            document.getElementById('tradingStrategy').disabled = true;
-            document.getElementById('barrierOffset').disabled = true;
-            
-            addLogEntry(`Switching to recovery mode: ${recoveryStrategy.toUpperCase()} ${recoveryBarrier}`, 'warning');
-            
-            // Unsubscribe from current contract
-            ws.send(JSON.stringify({ forget: contract.id }));
-            currentContract = null;
-            
-            // Continue with recovery trade
-            setTimeout(() => {
-                if (isTrading) {
-                    placeRecoveryTrade();
-                }
-            }, 1000);
+            if (!isRecoveryTrade) {
+                // Initial strategy lost, switch to primary recovery
+                const recoveryBarrier = document.getElementById('recoveryBarrier').value;
+                const recoveryStrategy = document.getElementById('recoveryStrategy').value;
+                
+                // Lock initial strategy controls
+                document.getElementById('tradingStrategy').disabled = true;
+                document.getElementById('barrierOffset').disabled = true;
+                
+                addLogEntry(`Initial strategy lost. Switching to recovery mode: ${recoveryStrategy.toUpperCase()} ${recoveryBarrier}`, 'warning');
+                
+                // Unsubscribe and place recovery trade
+                ws.send(JSON.stringify({ forget: contract.id }));
+                currentContract = null;
+                
+                setTimeout(() => {
+                    if (isTrading) {
+                        placeRecoveryTrade();
+                    }
+                }, 1000);
+            } else if (!isSecondaryRecoveryTrade) {
+                // Primary recovery lost, switch to secondary recovery
+                const secondaryBarrier = document.getElementById('secondaryRecoveryBarrier').value;
+                const secondaryStrategy = document.getElementById('secondaryRecoveryStrategy').value;
+                
+                // Lock primary recovery controls
+                document.getElementById('recoveryBarrier').disabled = true;
+                document.getElementById('recoveryStrategy').disabled = true;
+                document.getElementById('secondaryRecoveryBarrier').disabled = true;
+                
+                addLogEntry(`Recovery trade lost. Switching to secondary recovery: ${secondaryStrategy.toUpperCase()} ${secondaryBarrier}`, 'warning');
+                
+                // Unsubscribe and place secondary recovery trade
+                ws.send(JSON.stringify({ forget: contract.id }));
+                currentContract = null;
+                
+                setTimeout(() => {
+                    if (isTrading) {
+                        placeSecondaryRecoveryTrade();
+                    }
+                }, 1000);
+            } else {
+                // Secondary recovery lost, stay in secondary recovery mode
+                addLogEntry('Secondary recovery trade lost. Continuing with secondary recovery...', 'warning');
+                
+                // Unsubscribe and continue with secondary recovery
+                ws.send(JSON.stringify({ forget: contract.id }));
+                currentContract = null;
+                
+                setTimeout(() => {
+                    if (isTrading) {
+                        placeSecondaryRecoveryTrade();
+                    }
+                }, 1000);
+            }
         }
         
-        tradingStats.profitLoss += profit;
         updateStats();
     }
 }
@@ -470,24 +607,31 @@ function placeTrade() {
     const duration = document.getElementById('duration').value;
     const durationType = document.getElementById('durationType').value;
     const strategy = document.getElementById('tradingStrategy').value;
+    const barrierDigit = document.getElementById('targetDigit').value;
     
+    // First request a proposal
     const proposalRequest = {
         proposal: 1,
         amount: parseFloat(stake),
-        basis: 'stake',
+        basis: "stake",
         contract_type: strategy === 'over' ? 'DIGITOVER' : 'DIGITUNDER',
-        currency: 'USD',
+        currency: "USD",
         symbol: market,
         duration: parseInt(duration),
         duration_unit: durationType,
-        barrier: 0  // Always use 0 for initial trades
+        barrier: barrierDigit.toString()
     };
     
-    addLogEntry(`Requesting ${strategy.toUpperCase()} trade with barrier 0...`, 'info');
-    ws.send(JSON.stringify(proposalRequest));
+    try {
+        console.log('Sending proposal request:', proposalRequest);
+        addLogEntry(`Requesting proposal for ${strategy.toUpperCase()} ${barrierDigit}...`, 'info');
+        ws.send(JSON.stringify(proposalRequest));
+    } catch (error) {
+        console.error('Error sending proposal request:', error);
+        addLogEntry(`Error sending proposal request: ${error.message}`, 'error');
+    }
 }
 
-// Add new function for recovery trades
 function placeRecoveryTrade() {
     if (!isTrading || currentContract) return;
     
@@ -501,17 +645,56 @@ function placeRecoveryTrade() {
     const proposalRequest = {
         proposal: 1,
         amount: parseFloat(stake),
-        basis: 'stake',
+        basis: "stake",
         contract_type: recoveryStrategy === 'over' ? 'DIGITOVER' : 'DIGITUNDER',
-        currency: 'USD',
+        currency: "USD",
         symbol: market,
         duration: parseInt(duration),
         duration_unit: durationType,
-        barrier: parseInt(recoveryBarrier)  // Use recovery barrier for recovery trades
+        barrier: recoveryBarrier.toString()
     };
     
-    addLogEntry(`Requesting recovery trade: ${recoveryStrategy.toUpperCase()} ${recoveryBarrier}...`, 'info');
-    ws.send(JSON.stringify(proposalRequest));
+    try {
+        console.log('Sending recovery proposal request:', proposalRequest);
+        addLogEntry(`Requesting recovery proposal for ${recoveryStrategy.toUpperCase()} ${recoveryBarrier}...`, 'info');
+        ws.send(JSON.stringify(proposalRequest));
+    } catch (error) {
+        console.error('Error sending recovery proposal request:', error);
+        addLogEntry(`Error sending recovery proposal: ${error.message}`, 'error');
+    }
+}
+
+// Add new function for secondary recovery trade
+function placeSecondaryRecoveryTrade() {
+    if (!isTrading || currentContract) return;
+    
+    const market = document.getElementById('market').value;
+    const stake = document.getElementById('stakeAmount').value;
+    const duration = document.getElementById('duration').value;
+    const durationType = document.getElementById('durationType').value;
+    const secondaryBarrier = document.getElementById('secondaryRecoveryBarrier').value;
+    const secondaryStrategy = document.getElementById('secondaryRecoveryStrategy').value;
+    
+    const proposalRequest = {
+        proposal: 1,
+        amount: parseFloat(stake),
+        basis: "stake",
+        contract_type: secondaryStrategy === 'over' ? 'DIGITOVER' : 'DIGITUNDER',
+        currency: "USD",
+        symbol: market,
+        duration: parseInt(duration),
+        duration_unit: durationType,
+        barrier: secondaryBarrier.toString()
+    };
+    
+    try {
+        console.log('Sending secondary recovery proposal request:', proposalRequest);
+        addLogEntry(`Requesting secondary recovery proposal for ${secondaryStrategy.toUpperCase()} ${secondaryBarrier}...`, 'info');
+        ws.send(JSON.stringify(proposalRequest));
+    } catch (error) {
+        console.error('Error sending secondary recovery proposal request:', error);
+        addLogEntry(`Error sending secondary recovery proposal: ${error.message}`, 'error');
+    }
 }
 
 // Initialize WebSocket connection
@@ -578,9 +761,10 @@ function updateStats() {
     if (elements.winCount) elements.winCount.textContent = tradingStats.wins;
     if (elements.lossCount) elements.lossCount.textContent = tradingStats.losses;
     if (elements.profitLoss) {
-        elements.profitLoss.textContent = tradingStats.profitLoss.toFixed(2);
+        const profitLossValue = parseFloat(tradingStats.profitLoss);
+        elements.profitLoss.textContent = `${profitLossValue >= 0 ? '+' : ''}${profitLossValue.toFixed(2)} USD`;
         elements.profitLoss.classList.remove('text-success', 'text-danger');
-        elements.profitLoss.classList.add(tradingStats.profitLoss >= 0 ? 'text-success' : 'text-danger');
+        elements.profitLoss.classList.add(profitLossValue >= 0 ? 'text-success' : 'text-danger');
     }
 }
 
@@ -630,6 +814,205 @@ const styles = `
 const styleSheet = document.createElement("style");
 styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
+
+// Update placeBotTrade function to properly use the barrier
+function placeBotTrade() {
+    if (!isTrading) return;
+    
+    const market = document.getElementById('market').value;
+    const barrierDigit = document.getElementById('targetDigit').value;
+    const prediction = document.getElementById('digitPrediction').value;
+    const stake = document.getElementById('stakeAmount').value;
+    const duration = document.getElementById('duration').value;
+    const durationType = document.getElementById('durationType').value;
+
+    // Debug log
+    console.log('Current barrier digit:', barrierDigit);
+
+    // Create the proposal request with explicit barrier
+    const proposalRequest = {
+        proposal: 1,
+        amount: parseFloat(stake),
+        basis: "stake",
+        contract_type: prediction === 'over' ? 'DIGITOVER' : 
+                      prediction === 'under' ? 'DIGITUNDER' :
+                      prediction === 'matches' ? 'DIGITMATCHES' : 'DIGITDIFFERS',
+        currency: "USD",
+        duration: parseInt(duration),
+        duration_unit: durationType,
+        symbol: market,
+        barrier: barrierDigit.toString() // Ensure barrier is sent as string
+    };
+
+    // Log the full request
+    console.log('Sending trade request:', proposalRequest);
+    
+    // Send the request
+    ws.send(JSON.stringify(proposalRequest));
+    
+    // Log the trade details
+    addLogEntry(`Requesting ${prediction.toUpperCase()} ${barrierDigit} trade on ${market}...`, 'info');
+}
+
+// Add input validation and immediate update
+document.addEventListener('DOMContentLoaded', function() {
+    const targetDigitInput = document.getElementById('targetDigit');
+    
+    targetDigitInput.addEventListener('input', function() {
+        let value = parseInt(this.value);
+        
+        // Validate and update immediately
+        if (isNaN(value) || value < 0) {
+            value = 0;
+        } else if (value > 9) {
+            value = 9;
+        }
+        
+        this.value = value.toString();
+        console.log('Barrier digit updated to:', this.value);
+        addLogEntry(`Barrier digit set to ${this.value}`, 'info');
+    });
+
+    // Ensure initial value is set
+    if (!targetDigitInput.value) {
+        targetDigitInput.value = '0';
+    }
+});
+
+// Add prediction type validation
+document.getElementById('digitPrediction').addEventListener('change', function() {
+    const digit = document.getElementById('targetDigit').value;
+    addLogEntry(`Prediction type changed to ${this.value.toUpperCase()} ${digit}`, 'info');
+});
+
+// Add error handler
+function handleError(data) {
+    console.error('API Error:', data);
+    addLogEntry(`API Error: ${data.error.message}`, 'error');
+    
+    // Reset trading state if needed
+    if (isTrading) {
+        setTimeout(() => {
+            if (isTrading) {
+                addLogEntry('Retrying trade...', 'info');
+                placeTrade();
+            }
+        }, 1000);
+    }
+}
+
+// Update the disconnect button handler
+document.getElementById('disconnectBtn').addEventListener('click', function() {
+    // Stop trading if active
+    if (isTrading) {
+        stopTrading();
+    }
+    
+    // Close WebSocket connection
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+    }
+    
+    // Reset all trading stats
+    document.getElementById('totalTrades').textContent = '0';
+    document.getElementById('winCount').textContent = '0';
+    document.getElementById('lossCount').textContent = '0';
+    document.getElementById('profitLoss').textContent = '0.00';
+    
+    // Hide trading sections
+    document.getElementById('accountInfo').style.display = 'none';
+    document.getElementById('tradingSection').style.display = 'none';
+    document.getElementById('tradingStats').style.display = 'none';
+    
+    // Show API form but keep the stored token
+    document.getElementById('apiForm').style.display = 'block';
+    
+    // Clear the input field but don't remove from localStorage
+    document.getElementById('apiToken').value = '';
+    
+    // Reset WebSocket
+    ws = null;
+    
+    addLogEntry('Disconnected. Enter new API token to reconnect.', 'warning');
+});
+
+// Add this function to reset trading stats
+function resetTradingStats() {
+    tradingStats.totalTrades = 0;
+    tradingStats.wins = 0;
+    tradingStats.losses = 0;
+    tradingStats.profitLoss = 0;
+    updateStats();
+    addLogEntry('Trading statistics have been reset', 'warning');
+}
+
+// Add event listener for the refresh button
+document.getElementById('refreshStats').addEventListener('click', function() {
+    resetTradingStats();
+});
+
+// Add new function to subscribe to ticks
+function subscribeToTicks() {
+    const market = document.getElementById('market').value;
+    ws.send(JSON.stringify({
+        ticks: market,
+        subscribe: 1
+    }));
+}
+
+// Update handler for tick updates
+function handleTick(tick) {
+    if (!tick || !tick.quote) return;
+    
+    // Use the exact price from the API
+    const price = tick.quote;
+    
+    // Convert to string and ensure proper decimal representation
+    const priceString = price.toString().includes('.') ? price.toString() : price.toString() + '.0';
+    
+    // Get the last character after ensuring decimal representation
+    const lastDigit = priceString.replace(/[^0-9]/g, '').slice(-1);
+    
+    // Update displays
+    const priceDisplay = document.getElementById('currentPrice');
+    const lastDigitDisplay = document.getElementById('lastDigit');
+    
+    if (priceDisplay) {
+        // Display the exact price string with preserved decimals
+        priceDisplay.textContent = priceString;
+        // Update price color based on movement
+        if (price > lastPrice) {
+            priceDisplay.style.color = '#69f0ae';
+        } else if (price < lastPrice) {
+            priceDisplay.style.color = '#ff4081';
+        }
+    }
+    
+    if (lastDigitDisplay) {
+        lastDigitDisplay.textContent = lastDigit;
+        lastDigitDisplay.className = 'stat-value digit-display ' + 
+            (parseInt(lastDigit) % 2 === 0 ? 'digit-even' : 'digit-odd');
+    }
+    
+    // Store last price with proper decimal representation
+    lastPrice = price;
+}
+
+// Update market selection reset to use proper decimal format
+document.getElementById('market').addEventListener('change', function() {
+    // Unsubscribe from previous market ticks
+    ws.send(JSON.stringify({
+        forget_all: 'ticks'
+    }));
+    
+    // Subscribe to new market ticks
+    subscribeToTicks();
+    
+    // Reset displays with proper decimal format
+    document.getElementById('currentPrice').textContent = '0.0';
+    document.getElementById('lastDigit').textContent = '0';
+    lastPrice = 0;
+});
 </script>
 
 <style>
@@ -747,5 +1130,105 @@ document.head.appendChild(styleSheet);
     .activity-log::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.3);
     }
+
+    /* Add style for the refresh button */
+    #refreshStats {
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #ffd740;
+    }
+
+    #refreshStats:hover {
+        background-color: rgba(255, 215, 64, 0.1);
+    }
+
+    .market-stat {
+        text-align: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .market-stat label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 5px;
+    }
+
+    .market-stat .stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #69f0ae;
+    }
+
+    #currentPrice {
+        font-family: 'Roboto Mono', monospace;
+        font-size: 1.5rem;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+    
+    .price-up {
+        color: #69f0ae;
+        transition: color 0.2s ease;
+    }
+    
+    .price-down {
+        color: #ff4081;
+        transition: color 0.2s ease;
+    }
+    
+    .market-stat {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .market-stat label {
+        font-size: 0.875rem;
+        opacity: 0.7;
+        margin-bottom: 0.5rem;
+    }
+
+    .digit-display {
+        font-family: 'Roboto Mono', monospace;
+        font-size: 2rem !important;
+        font-weight: 700;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .digit-even {
+        background-color: rgba(105, 240, 174, 0.1);
+        color: #69f0ae !important;
+    }
+
+    .digit-odd {
+        background-color: rgba(255, 64, 129, 0.1);
+        color: #ff4081 !important;
+    }
+
+    .market-stat {
+        text-align: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .market-stat label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    #currentPrice {
+        font-family: 'Roboto Mono', monospace;
+        font-size: 1.5rem;
+        letter-spacing: 0.5px;
+    }
 </style>
-{% endblock %} 
+{% endblock %}

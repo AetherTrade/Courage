@@ -1,0 +1,1923 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <!-- API Connection Card -->
+            <div class="card api-card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Courage Flux Bot</h3>
+                    <p class="text-muted">Advanced Over/Under Pattern Analyzer</p>
+                    
+                    <div class="features mb-4">
+                        <div><i class="bx bx-check text-success"></i> Flux Pattern Recognition</div>
+                        <div><i class="bx bx-check text-success"></i> Dynamic Over/Under Analysis</div>
+                        <div><i class="bx bx-check text-success"></i> Momentum-based Entry Points</div>
+                        <div><i class="bx bx-check text-success"></i> Advanced Risk Management</div>
+                    </div>
+                    
+                    <!-- API Form -->
+                    <form id="apiForm">
+                        <div class="mb-3">
+                            <label class="form-label">Deriv API Token</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="apiToken" required>
+                                <button class="btn btn-outline-secondary" type="button" id="toggleToken">
+                                    <i class="bx bx-show"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                Get your API token from <a href="https://app.deriv.com/account/api-token" target="_blank">Deriv</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="connectBtn">
+                            <i class="bx bx-link"></i>
+                            <span class="loading-spinner spinner-border spinner-border-sm d-none"></span>
+                            Connect
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Account Info Card -->
+            <div class="card api-card mb-4" id="accountInfo" style="display: none;">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-1" id="accountName">-</h5>
+                            <p class="text-muted mb-0" id="accountType">-</p>
+                        </div>
+                        <div class="col-auto">
+                            <div class="balance-card p-3 rounded">
+                                <div class="balance-value" id="balanceAmount">0.00</div>
+                                <div class="currency" id="balanceCurrency">USD</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-danger mt-3" id="disconnectBtn">
+                        <i class="bx bx-log-out"></i> Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add this after the account info card and before the activity log -->
+            <div class="card api-card mb-4" id="patternDisplay" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Pattern Analysis</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <label>Current Price</label>
+                                <div class="stat-value" id="currentPrice">0.00</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <label>Last Digit</label>
+                                <div class="last-digit" id="currentLastDigit">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-item">
+                                <label>Target Pattern</label>
+                                <div class="pattern-display" id="targetPattern">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="digit-history mt-3">
+                        <label class="mb-2">Last 10 Digits</label>
+                        <div class="digit-container" id="digitHistory"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add this after the Pattern Analysis card and before the Trading Controls -->
+            <div class="card api-card mb-4" id="statsCard" style="display: none;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Trading Statistics</h5>
+                        <button class="btn btn-outline-secondary btn-sm" id="resetStats">
+                            <i class="bx bx-refresh"></i> Reset
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Total Trades</label>
+                                <div class="stat-value" id="totalTrades">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Wins</label>
+                                <div class="stat-value text-success" id="totalWins">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Losses</label>
+                                <div class="stat-value text-danger" id="totalLosses">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Profit/Loss</label>
+                                <div class="stat-value" id="totalProfitLoss">0.00 USD</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trading Controls -->
+            <div class="card api-card mb-4" id="tradingSection" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Trading Parameters</h5>
+                    
+                    <!-- Market Selection -->
+                    <div class="mb-3">
+                        <label class="form-label">Market</label>
+                        <select class="form-control" id="market">
+                            <optgroup label="1 Second Volatility">
+                                <option value="1HZ10V">Volatility 10 (1s)</option>
+                                <option value="1HZ25V">Volatility 25 (1s)</option>
+                                <option value="1HZ50V">Volatility 50 (1s)</option>
+                                <option value="1HZ75V">Volatility 75 (1s)</option>
+                                <option value="1HZ100V">Volatility 100 (1s)</option>
+                            </optgroup>
+                            <optgroup label="Standard Volatility">
+                                <option value="R_10">Volatility 10 Index</option>
+                                <option value="R_25">Volatility 25 Index</option>
+                                <option value="R_50">Volatility 50 Index</option>
+                                <option value="R_75">Volatility 75 Index</option>
+                                <option value="R_100">Volatility 100 Index</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Pattern Analysis Settings -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Pattern Analysis</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Pattern Length</label>
+                                    <select class="form-control" id="patternLength">
+                                        <option value="0">No Pattern</option>
+                                        <option value="2">2 Digits</option>
+                                        <option value="3">3 Digits</option>
+                                        <option value="4">4 Digits</option>
+                                        <option value="5">5 Digits</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pattern Input Fields -->
+                        <div id="patternInputs" style="display: none;">
+                            <label class="form-label">Pattern Sequence</label>
+                            <div class="pattern-fields d-flex gap-2 mb-3">
+                                <!-- Pattern inputs will be dynamically added here -->
+                            </div>
+                            <div class="form-text text-gold-secondary">Enter the digit sequence to match (0-9)</div>
+                        </div>
+                    </div>
+
+                    <!-- Trade Settings -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Trade Settings</h6>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Stake Amount ($)</label>
+                                    <input type="number" class="form-control" id="stakeAmount" value="1" min="1" step="0.5">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Trade Type</label>
+                                    <select class="form-control" id="tradeType">
+                                        <option value="DIGITOVER">Over</option>
+                                        <option value="DIGITUNDER">Under</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Target Digit (Over/Under)</label>
+                                    <input type="number" class="form-control" id="targetDigitValue" value="5" min="0" max="9">
+                                    <div class="form-text glow-text">
+                                        When pattern is found, trade will be placed over/under this digit
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <label class="form-label">Ticks</label>
+                                    <select class="form-control" id="tickInterval">
+                                        <option value="1">1 Tick</option>
+                                        <option value="2">2 Ticks</option>
+                                        <option value="3">3 Ticks</option>
+                                        <option value="4">4 Ticks</option>
+                                        <option value="5">5 Ticks</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Single Digit Input -->
+                            <div class="col-md-4" id="singleDigitDiv" style="display: none;">
+                                <div class="mb-3">
+                                    <label class="form-label">Enter Digit</label>
+                                    <input type="number" class="form-control" id="singleDigit" min="0" max="9" value="5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recovery Strategies -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">Recovery Strategies</h6>
+                        
+                        <!-- Primary Recovery -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="usePrimaryRecovery">
+                                <label class="form-check-label">Enable Primary Recovery</label>
+                            </div>
+                            <div id="primaryRecoverySettings" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Recovery Type</label>
+                                            <select class="form-control" id="recoveryType">
+                                                <option value="DIGITOVER">Over</option>
+                                                <option value="DIGITUNDER">Under</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Recovery Digit</label>
+                                            <input type="number" class="form-control" id="recoveryDigit" min="0" max="9" value="5">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Max Attempts</label>
+                                            <input type="number" class="form-control" id="recoveryAttempts" value="3" min="1" max="10">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Recovery Multiplier</label>
+                                            <input type="number" class="form-control" id="recoveryMultiplier" value="2.5" min="1.1" step="0.1">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Stop Loss ($)</label>
+                                            <input type="number" class="form-control" id="recoveryStopLoss" value="100" min="0" step="1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Secondary Recovery -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="useSecondaryRecovery">
+                                <label class="form-check-label">Enable Secondary Recovery</label>
+                            </div>
+                            <div id="secondaryRecoverySettings" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Recovery Type</label>
+                                            <select class="form-control" id="secondaryRecoveryType">
+                                                <option value="DIGITOVER">Over</option>
+                                                <option value="DIGITUNDER">Under</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Recovery Digit</label>
+                                            <input type="number" class="form-control" id="secondaryRecoveryDigit" min="0" max="9" value="5">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Max Attempts</label>
+                                            <input type="number" class="form-control" id="secondaryRecoveryAttempts" value="3" min="1" max="10">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Recovery Multiplier</label>
+                                            <input type="number" class="form-control" id="secondaryRecoveryMultiplier" value="2.5" min="1.1" step="0.1">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Stop Loss ($)</label>
+                                            <input type="number" class="form-control" id="secondaryRecoveryStopLoss" value="100" min="0" step="1">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Martingale Strategy -->
+                        <div class="mb-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="useMartingale">
+                                <label class="form-check-label">Enable Martingale Strategy</label>
+                            </div>
+                            <div id="martingaleSettings" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Multiplier</label>
+                                            <input type="number" class="form-control" id="martingaleMultiplier" value="2" min="1.1" step="0.1">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Max Steps</label>
+                                            <input type="number" class="form-control" id="martingaleSteps" value="3" min="1" max="10">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Turbo Mode -->
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="turboMode">
+                            <label class="form-check-label">Turbo Mode</label>
+                            <small class="form-text text-gold-secondary" id="turboWarning">Warning: Makes multiple trades simultaneously</small>
+                        </div>
+                    </div>
+
+                    <!-- Trading Buttons -->
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success btn-lg w-100" id="startTradingBtn">
+                            <i class="bx bx-play"></i> Start Trading
+                        </button>
+                        <button class="btn btn-danger btn-lg w-100 d-none" id="stopTradingBtn">
+                            <i class="bx bx-stop"></i> Stop Trading
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="card api-card" id="logSection">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Activity Log</h5>
+                    <div class="activity-log" id="activityLog"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    /* Gold Theme Colors */
+    :root {
+        --gold-primary: #FFD700;
+        --gold-secondary: #DAA520;
+        --gold-light: #FFEBCD;
+        --gold-dark: #B8860B;
+        --gold-accent: #FFF8DC;
+    }
+
+    .api-card {
+        background: linear-gradient(145deg, rgba(26, 35, 126, 0.2), rgba(38, 50, 170, 0.2));
+        border: 1px solid rgba(218, 165, 32, 0.3);
+        color: var(--gold-primary);
+    }
+
+    .card-title {
+        color: var(--gold-primary) !important;
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        letter-spacing: 1px;
+    }
+
+    .text-muted {
+        color: var(--gold-secondary) !important;
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    .features div {
+        color: var(--gold-light);
+        font-family: 'Quicksand', sans-serif;
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .features i {
+        color: var(--gold-primary);
+    }
+
+    /* Form Styling */
+    .form-label {
+        color: var(--gold-secondary);
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 600;
+    }
+
+    .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--gold-dark);
+        color: var(--gold-light);
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--gold-primary);
+        box-shadow: 0 0 0 0.25rem rgba(255, 215, 0, 0.2);
+        color: var(--gold-light);
+    }
+
+    /* Balance Card */
+    .balance-card {
+        background: linear-gradient(45deg, #1a237e, #303f9f);
+        border: 1px solid var(--gold-primary);
+    }
+
+    .balance-value {
+        color: var(--gold-primary);
+        font-family: 'Cinzel', serif;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+
+    .currency {
+        color: var(--gold-secondary);
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(45deg, var(--gold-dark), var(--gold-primary));
+        border: none;
+        color: #000;
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, var(--gold-primary), var(--gold-dark));
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+    }
+
+    /* Activity Log Styles */
+    .activity-log {
+        height: 300px;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--gold-dark);
+        border-radius: 4px;
+        padding: 10px;
+    }
+
+    .log-entry {
+        padding: 8px;
+        border-bottom: 1px solid rgba(218, 165, 32, 0.2);
+        font-family: 'Consolas', monospace;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .log-time {
+        color: var(--gold-secondary);
+        font-size: 0.9em;
+        white-space: nowrap;
+    }
+
+    .log-type {
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .log-type-info {
+        background: rgba(13, 110, 253, 0.2);
+        color: #0d6efd;
+    }
+
+    .log-type-success {
+        background: rgba(25, 135, 84, 0.2);
+        color: #198754;
+    }
+
+    .log-type-error {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+    }
+
+    .log-type-warning {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .log-message {
+        color: var(--gold-light);
+        flex-grow: 1;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: rgba(218, 165, 32, 0.1);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--gold-dark);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--gold-primary);
+    }
+
+    .pattern-digit-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .pattern-digit {
+        text-align: center;
+        font-family: 'Cinzel', serif;
+        font-weight: 600;
+        color: var(--gold-primary);
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--gold-dark);
+    }
+
+    .pattern-digit:focus {
+        border-color: var(--gold-primary);
+        box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+    }
+
+    .pattern-digit-label {
+        font-size: 0.8rem;
+        color: var(--gold-secondary);
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    .pattern-fields {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--gold-dark);
+    }
+
+    /* Dropdown Styling */
+    select.form-control {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--gold-dark);
+        color: var(--gold-primary);
+    }
+
+    /* Style for dropdown options */
+    select.form-control option {
+        background-color: #1a1a1a;
+        color: black;
+        padding: 10px;
+    }
+
+    /* Style for dropdown when opened */
+    select.form-control:focus {
+        border-color: var(--gold-primary);
+        box-shadow: 0 0 0 0.2rem rgba(255, 215, 0, 0.25);
+    }
+
+    /* Style for select when disabled */
+    select.form-control:disabled {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: rgba(218, 165, 32, 0.5);
+    }
+
+    /* Style for option hover/focus */
+    select.form-control option:hover,
+    select.form-control option:focus,
+    select.form-control option:active,
+    select.form-control option:checked {
+        background: linear-gradient(#f0f0f0, #f0f0f0);
+        background-color: #f0f0f0 !important;
+        color: black !important;
+    }
+
+    /* Ensure text is visible in Firefox */
+    @-moz-document url-prefix() {
+        select.form-control option {
+            background-color: #ffffff;
+            color: black;
+        }
+    }
+
+    /* Ensure text is visible in Safari */
+    @media screen and (-webkit-min-device-pixel-ratio:0) {
+        select.form-control option {
+            background-color: #ffffff;
+            color: black;
+        }
+    }
+
+    @keyframes warningGlow {
+        0% { color: var(--gold-secondary); text-shadow: 0 0 5px rgba(255, 165, 0, 0.5); }
+        50% { color: #ff6b6b; text-shadow: 0 0 10px rgba(255, 107, 107, 0.7); }
+        100% { color: var(--gold-secondary); text-shadow: 0 0 5px rgba(255, 165, 0, 0.5); }
+    }
+
+    .warning-glow {
+        animation: warningGlow 2s infinite;
+        font-weight: 500;
+    }
+
+    /* Last Digit Display */
+    .last-digit {
+        width: 60px;
+        height: 60px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: var(--gold-primary);
+        margin: 0 auto;
+        border: 2px solid var(--gold-dark);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Digit History */
+    .digit-container {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        border: 1px solid var(--gold-dark);
+    }
+
+    .digit-box {
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--gold-dark);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Consolas', monospace;
+        font-size: 18px;
+        color: var(--gold-primary);
+        transition: all 0.3s ease;
+    }
+
+    .digit-box.highlight {
+        border-color: var(--gold-primary);
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        transform: scale(1.1);
+    }
+
+    .pattern-display {
+        font-family: 'Consolas', monospace;
+        font-size: 18px;
+        color: var(--gold-primary);
+        text-align: center;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--gold-dark);
+        border-radius: 4px;
+    }
+
+    @keyframes purpleGlow {
+        0% {
+            color: #a855f7;
+            text-shadow: 0 0 5px #a855f7;
+        }
+        50% {
+            color: #7c3aed;
+            text-shadow: 0 0 10px #7c3aed;
+        }
+        100% {
+            color: #a855f7;
+            text-shadow: 0 0 5px #a855f7;
+        }
+    }
+
+    .glow-text {
+        animation: purpleGlow 2s infinite;
+        font-weight: 500;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        border: 1px solid var(--gold-dark);
+    }
+    
+    .stat-item label {
+        font-size: 0.9rem;
+        color: var(--gold-secondary);
+        margin-bottom: 5px;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+        font-family: 'Consolas', monospace;
+        color: var(--gold-primary);
+    }
+    
+    .text-success {
+        color: #10b981 !important;
+    }
+    
+    .text-danger {
+        color: #ef4444 !important;
+    }
+</style>
+
+<!-- Add Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let ws = null;
+let isTrading = false;
+let lastDigits = [];
+let currentPattern = [];
+let martingaleLevel = 0;
+let currentStake = 1;
+let authorized = false;
+let activeSubscriptions = {
+    contract: null,
+    ticks: null
+};
+
+// Add trade state tracking
+let isProcessingTrade = false;
+let lastTradeTime = 0;
+const TRADE_COOLDOWN = 1000; // 1 second cooldown between trades
+
+// Add at the top with other state variables
+let turboMode = false;
+let pendingTrades = 0;
+const MAX_PENDING_TRADES = 5; // Maximum simultaneous trades in turbo mode
+
+// Add to your existing variables
+let tickCounter = 0;
+let digitHistory = [];
+const MAX_HISTORY = 10;
+
+// Add trading stats object
+const tradingStats = {
+    totalTrades: 0,
+    wins: 0,
+    losses: 0,
+    profitLoss: 0
+};
+
+let activeContracts = new Set();
+
+// Update trade queue management
+let tradeQueue = [];
+let isProcessingQueue = false;
+const QUEUE_PROCESSING_DELAY = 500; // Delay between trades in ms
+
+// Auto-connect and persistence functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Check for saved token
+    const savedToken = localStorage.getItem('deriv_api_token');
+    if (savedToken) {
+        document.getElementById('apiToken').value = savedToken;
+        console.log('Auto-connecting with saved token...');
+        setTimeout(() => {
+            document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+            logActivity('Auto-connecting to Deriv...', 'info');
+        }, 1000);
+    }
+
+    // Add reconnection on visibility change
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            const token = localStorage.getItem('deriv_api_token');
+            if (token && (!ws || ws.readyState !== WebSocket.OPEN)) {
+                console.log('Tab visible, reconnecting...');
+                document.getElementById('apiToken').value = token;
+                document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+            }
+        }
+    });
+
+    // Add periodic connection check
+    setInterval(() => {
+        const token = localStorage.getItem('deriv_api_token');
+        if (token && (!ws || ws.readyState !== WebSocket.OPEN)) {
+            console.log('Connection check: reconnecting...');
+            document.getElementById('apiToken').value = token;
+            document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+        }
+    }, 30000); // Check every 30 seconds
+});
+
+// Initialize WebSocket connection
+function connectWebSocket(token) {
+    if (ws) {
+        ws.close();
+    }
+
+    ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1089');
+
+    ws.onopen = function() {
+        console.log('WebSocket connected');
+        // Save token for persistence
+        localStorage.setItem('deriv_api_token', token);
+        ws.send(JSON.stringify({ authorize: token }));
+    };
+
+    ws.onmessage = function(msg) {
+        const data = JSON.parse(msg.data);
+        handleMessage(data);
+    };
+
+    ws.onclose = function() {
+        console.log('WebSocket disconnected');
+        if (authorized) {
+            // Attempt to reconnect if previously authorized
+            const savedToken = localStorage.getItem('deriv_api_token');
+            if (savedToken) {
+                setTimeout(() => connectWebSocket(savedToken), 1000);
+            }
+        }
+    };
+
+    ws.onerror = function(error) {
+        console.error('WebSocket Error:', error);
+        logActivity('Connection error', 'error');
+    };
+}
+
+// Update logActivity function
+function logActivity(message, type = 'info') {
+    const log = document.getElementById('activityLog');
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    
+    // Create time element
+    const timeSpan = document.createElement('span');
+    timeSpan.className = 'log-time';
+    const now = new Date();
+    timeSpan.textContent = now.toLocaleTimeString('en-US', { 
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        fractionalSecondDigits: 3
+    });
+    
+    // Create type badge
+    const typeBadge = document.createElement('span');
+    typeBadge.className = `log-type log-type-${type.toLowerCase()}`;
+    typeBadge.textContent = type.toUpperCase();
+    
+    // Create message element
+    const messageSpan = document.createElement('span');
+    messageSpan.className = 'log-message';
+    messageSpan.textContent = message;
+    
+    // Assemble the entry
+    entry.appendChild(timeSpan);
+    entry.appendChild(typeBadge);
+    entry.appendChild(messageSpan);
+    
+    // Add to log at the top
+    log.insertBefore(entry, log.firstChild);
+    
+    // Auto-scroll to latest entry
+    log.scrollTop = 0;
+    
+    // Limit log entries
+    while (log.children.length > 1000) {
+        log.removeChild(log.lastChild);
+    }
+    
+    // Also log to console for debugging
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
+// Add the handleTickHistory function
+function handleTickHistory(history) {
+    if (!history || !history.prices) return;
+    
+    // Process the last few ticks
+    const recentTicks = history.prices.slice(-10);
+    recentTicks.forEach(tick => {
+        const price = tick.quote.toFixed(2);
+        const lastDigit = price.slice(-1);
+        updateDigitHistory(lastDigit);
+    });
+    
+    logActivity('Tick history loaded', 'info');
+}
+
+// Update handleMessage function to properly track contract results
+function handleMessage(data) {
+    if (data.error) {
+        if (!data.error.message.includes('already subscribed')) {
+            logActivity(data.error.message, 'error');
+            isProcessingTrade = false;
+        }
+        return;
+    }
+
+    // Handle buy response
+    if (data.buy) {
+        const contractId = data.buy.contract_id;
+        lastContractId = contractId;
+        activeContracts.add(contractId);
+        logActivity('Trade placed successfully - ID: ' + contractId + ' (Waiting for result...)', 'success');
+        
+        // Subscribe to this specific contract
+        ws.send(JSON.stringify({
+            "proposal_open_contract": 1,
+            "contract_id": contractId,
+            "subscribe": 1
+        }));
+    }
+
+    // Handle contract updates
+    if (data.proposal_open_contract) {
+        const contract = data.proposal_open_contract;
+        
+        if (contract.status === 'sold' && activeContracts.has(contract.contract_id)) {
+            activeContracts.delete(contract.contract_id);
+            if (contract.contract_id === lastContractId) {
+                lastContractId = null;
+            }
+            
+            const profit = parseFloat(contract.profit);
+            tradingStats.totalTrades++;
+            tradingStats.profitLoss += profit;
+            
+            if (profit > 0) {
+                tradingStats.wins++;
+                logActivity(`Trade WON - Profit: +$${profit.toFixed(2)}`, 'success');
+            } else if (profit < 0) {
+                tradingStats.losses++;
+                logActivity(`Trade LOST - Loss: -$${Math.abs(profit).toFixed(2)}`, 'error');
+            }
+            
+            updateStatsDisplay();
+            isProcessingTrade = false;
+            
+            // Unsubscribe from this contract
+            ws.send(JSON.stringify({
+                "forget": contract.id
+            }));
+        }
+    }
+
+    // Handle balance updates
+    if (data.balance) {
+        handleBalance(data.balance);
+    }
+
+    // Handle proposal response
+    if (data.proposal) {
+        const buy = {
+            "buy": data.proposal.id,
+            "price": data.proposal.ask_price
+        };
+        ws.send(JSON.stringify(buy));
+    }
+
+    // Handle other message types
+    if (data.tick) {
+        handleTick(data.tick);
+    }
+    if (data.history) {
+        handleTickHistory(data.history);
+    }
+    if (data.authorize) {
+        handleAuthorization(data);
+    }
+}
+
+// Handle authorization response
+function handleAuthorization(data) {
+    if (data.authorize) {
+        authorized = true;
+        document.getElementById('accountInfo').style.display = 'block';
+        document.getElementById('tradingSection').style.display = 'block';
+        document.getElementById('logSection').style.display = 'block';
+        document.getElementById('statsCard').style.display = 'block';
+        document.getElementById('patternDisplay').style.display = 'block';
+        
+        // Update account info
+        document.getElementById('accountName').textContent = data.authorize.fullname;
+        document.getElementById('accountType').textContent = data.authorize.account_type;
+        
+        // Subscribe to balance updates
+        ws.send(JSON.stringify({
+            "balance": 1,
+            "subscribe": 1
+        }));
+
+        // Subscribe to ticks for the selected market
+        subscribeTicks();
+
+        logActivity('Successfully connected to Deriv', 'success');
+    }
+}
+
+// Add new function to handle tick subscription
+function subscribeTicks() {
+    const market = document.getElementById('market').value;
+    
+    // Cancel existing subscription if any
+    if (activeSubscriptions.ticks) {
+        ws.send(JSON.stringify({
+            forget: activeSubscriptions.ticks
+        }));
+    }
+    
+    // Subscribe to new ticks
+    ws.send(JSON.stringify({
+        ticks: market,
+        subscribe: 1
+    }));
+}
+
+// Update market selection to resubscribe when changed
+document.getElementById('market').addEventListener('change', function() {
+    if (authorized) {
+        subscribeTicks();
+    }
+});
+
+// Update balance display
+function handleBalance(balance) {
+    if (!balance) return;
+    
+    const balanceAmount = document.getElementById('balanceAmount');
+    const balanceCurrency = document.getElementById('balanceCurrency');
+    
+    if (balanceAmount && balanceCurrency) {
+        balanceAmount.textContent = parseFloat(balance.balance).toFixed(2);
+        balanceCurrency.textContent = balance.currency;
+        logActivity(`Balance updated: ${balance.balance} ${balance.currency}`, 'info');
+    }
+}
+
+// Update the startBot function
+function startBot() {
+    if (!authorized) {
+        logActivity('Please connect to Deriv first', 'error');
+        return;
+    }
+    
+    const startBtn = document.getElementById('startTradingBtn');
+    const stopBtn = document.getElementById('stopTradingBtn');
+    
+    if (!isTrading) {
+        isTrading = true;
+        startBtn.classList.add('d-none');
+        stopBtn.classList.remove('d-none');
+        logActivity('Bot started', 'success');
+        
+        tickCounter = 0;
+        subscribeTicks();
+    }
+}
+
+// Update the stopBot function
+function stopBot() {
+    isTrading = false;
+    isProcessingTrade = false;
+    isProcessingQueue = false;
+    tradeQueue = []; // Clear the queue
+    
+    const startBtn = document.getElementById('startTradingBtn');
+    const stopBtn = document.getElementById('stopTradingBtn');
+    startBtn.classList.remove('d-none');
+    stopBtn.classList.add('d-none');
+    
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            "forget_all": "ticks"
+        }));
+    }
+    
+    logActivity('Bot stopped - Trade queue cleared', 'warning');
+}
+
+// Update event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Update button event listeners
+    document.getElementById('startTradingBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        startBot();
+    });
+    
+    document.getElementById('stopTradingBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        stopBot();
+    });
+});
+
+// Update disconnect handler to reset stats
+document.getElementById('disconnectBtn').addEventListener('click', function() {
+    stopBot();
+    resetStats();
+    if (ws) {
+        ws.close();
+    }
+});
+
+// Add a function to get decimal places based on market
+function getDecimalPlaces(market) {
+    const decimalRules = {
+        // 1 Second Volatility
+        '1HZ10V': 3,  // Volatility 10 (1s)
+        '1HZ25V': 3,  // Volatility 25 (1s)
+        '1HZ50V': 3,  // Volatility 50 (1s)
+        '1HZ75V': 3,  // Volatility 75 (1s)
+        '1HZ100V': 2, // Volatility 100 (1s)
+        
+        // Standard Volatility
+        'R_10': 4,    // Volatility 10
+        'R_25': 4,    // Volatility 25
+        'R_50': 3,    // Volatility 50
+        'R_75': 3,    // Volatility 75
+        'R_100': 2    // Volatility 100
+    };
+    
+    return decimalRules[market] || 2; // Default to 2 if market not found
+}
+
+// Update handleTick function to queue trades instead of immediate execution
+function handleTick(tick) {
+    if (!tick || !tick.quote) return;
+    
+    // Update price display
+    const price = tick.quote.toFixed(2);
+    document.getElementById('currentPrice').textContent = price;
+    
+    const lastDigit = price.slice(-1);
+    document.getElementById('currentLastDigit').textContent = lastDigit;
+    updateDigitHistory(lastDigit);
+    updateTargetPattern();
+    
+    if (!isTrading) return;
+    
+    const tickInterval = parseInt(document.getElementById('tickInterval').value) || 1;
+    tickCounter++;
+    
+    if (tickCounter >= tickInterval) {
+        tickCounter = 0;
+        
+        // Queue the trade instead of immediate execution
+        queueTrade();
+    }
+}
+
+// Update queueTrade function
+function queueTrade() {
+    if (!isTrading) return;
+    
+    const market = document.getElementById('market').value;
+    const tradeType = document.getElementById('tradeType').value;
+    const targetDigit = parseInt(document.getElementById('targetDigitValue').value);
+    const stake = parseFloat(document.getElementById('stakeAmount').value);
+    
+    const trade = {
+        market: market,
+        type: tradeType,
+        digit: targetDigit,
+        stake: stake,
+        timestamp: Date.now()
+    };
+    
+    tradeQueue.push(trade);
+    logActivity(`Trade queued: ${tradeType} ${targetDigit} at $${stake}`, 'info');
+    
+    // Start processing queue if not already processing
+    if (!isProcessingQueue) {
+        processTradeQueue();
+    }
+}
+
+// Update processTradeQueue function
+async function processTradeQueue() {
+    if (isProcessingQueue || !isTrading) return;
+    
+    isProcessingQueue = true;
+    
+    while (tradeQueue.length > 0 && isTrading) {
+        const trade = tradeQueue[0]; // Look at first trade without removing it
+        
+        // Check if we should process this trade
+        if (isProcessingTrade) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            continue;
+        }
+        
+        // Remove the trade from queue and process it
+        tradeQueue.shift();
+        
+        try {
+            await executeTrade(trade);
+            // Wait for the specified delay between trades
+            await new Promise(resolve => setTimeout(resolve, QUEUE_PROCESSING_DELAY));
+        } catch (error) {
+            logActivity(`Trade execution failed: ${error.message}`, 'error');
+        }
+    }
+    
+    isProcessingQueue = false;
+}
+
+// Add new executeTrade function
+function executeTrade(trade) {
+    return new Promise((resolve, reject) => {
+        if (!trade || !trade.type || !trade.digit) {
+            reject(new Error('Invalid trade parameters'));
+            return;
+        }
+        
+        isProcessingTrade = true;
+        
+        const proposal = {
+            "proposal": 1,
+            "amount": trade.stake,
+            "basis": "stake",
+            "contract_type": trade.type,
+            "currency": "USD",
+            "duration": 1,
+            "duration_unit": "t",
+            "symbol": trade.market,
+            "barrier": trade.digit
+        };
+        
+        // Send the proposal
+        ws.send(JSON.stringify(proposal));
+        
+        // Set up a timeout for the trade
+        const timeoutId = setTimeout(() => {
+            isProcessingTrade = false;
+            reject(new Error('Trade timeout'));
+        }, 5000); // 5 second timeout
+        
+        // Set up one-time handler for the next contract update
+        const handleContractResult = (data) => {
+            if (data.proposal_open_contract && data.proposal_open_contract.status === 'sold') {
+                clearTimeout(timeoutId);
+                isProcessingTrade = false;
+                resolve();
+            }
+        };
+        
+        // Add temporary message handler
+        const messageHandler = (event) => {
+            const data = JSON.parse(event.data);
+            handleContractResult(data);
+        };
+        
+        ws.addEventListener('message', messageHandler);
+        
+        // Clean up after trade completes or times out
+        setTimeout(() => {
+            ws.removeEventListener('message', messageHandler);
+        }, 5000);
+    });
+}
+
+// Update pattern length handler
+document.getElementById('patternLength').addEventListener('change', function() {
+    const patternFields = document.getElementById('patternFields');
+    const count = parseInt(this.value);
+    
+    if (count > 0) {
+        createPatternInputs(count);
+        patternFields.style.display = 'block';
+        logActivity(`Pattern mode activated - ${count} digits`, 'info');
+    } else {
+        patternFields.style.display = 'none';
+        document.querySelector('.pattern-fields').innerHTML = '';
+        updateTargetPattern();
+        logActivity('Direct trading mode activated', 'info');
+    }
+});
+
+// Update handleContractUpdate to properly track contract status
+function handleContractUpdate(contract) {
+    if (!contract) return;
+    
+    if (contract.status === 'sold') {
+        pendingTrades = Math.max(0, pendingTrades - 1);
+        if (!turboMode) {
+            isProcessingTrade = false;
+        }
+        
+        const profit = parseFloat(contract.profit);
+        tradingStats.totalTrades++;
+        tradingStats.profitLoss += profit;
+        
+        if (profit > 0) {
+            tradingStats.wins++;
+            logActivity(`Trade won: +$${profit.toFixed(2)}`, 'success');
+        } else if (profit < 0) {
+            tradingStats.losses++;
+            logActivity(`Trade lost: -$${Math.abs(profit).toFixed(2)}`, 'error');
+        }
+        
+        updateStatsDisplay();
+    }
+}
+
+// Setup event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Form submission
+    document.getElementById('apiForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const token = document.getElementById('apiToken').value;
+        connectWebSocket(token);
+    });
+    
+    // Toggle token visibility
+    document.getElementById('toggleToken').addEventListener('click', function() {
+        const input = document.getElementById('apiToken');
+        input.type = input.type === 'password' ? 'text' : 'password';
+    });
+    
+    // Trading controls
+    document.getElementById('startTradingBtn').addEventListener('click', startBot);
+    document.getElementById('stopTradingBtn').addEventListener('click', stopBot);
+    
+    // Martingale toggle
+    document.getElementById('useMartingale').addEventListener('change', function() {
+        document.getElementById('martingaleSettings').style.display = 
+            this.checked ? 'block' : 'none';
+    });
+    
+    // Disconnect button
+    document.getElementById('disconnectBtn').addEventListener('click', function() {
+        if (ws) {
+            ws.close();
+            authorized = false;
+            document.getElementById('accountInfo').style.display = 'none';
+            document.getElementById('tradingSection').style.display = 'none';
+            document.getElementById('logSection').style.display = 'none';
+            logActivity('Disconnected from Deriv', 'info');
+        }
+    });
+
+    // Turbo mode toggle
+    document.getElementById('turboMode').addEventListener('change', function() {
+        turboMode = this.checked;
+        const warningElement = document.getElementById('turboWarning');
+        
+        if (turboMode) {
+            warningElement.classList.add('warning-glow');
+            logActivity('Warning: Multiple trades will be placed simultaneously', 'warning');
+        } else {
+            warningElement.classList.remove('warning-glow');
+        }
+        
+        logActivity(`Turbo Mode ${turboMode ? 'enabled' : 'disabled'}`, 'info');
+    });
+
+    // Add pattern sequence input handler
+    document.querySelectorAll('.pattern-digit').forEach(input => {
+        input.addEventListener('change', function() {
+            updateTargetPattern();
+        });
+    });
+
+    // Add validation for target digit input
+    document.getElementById('targetDigitValue').addEventListener('input', function() {
+        let value = parseInt(this.value);
+        if (isNaN(value) || value < 0) {
+            this.value = 0;
+        } else if (value > 9) {
+            this.value = 9;
+        }
+    });
+
+    // Update pattern display to show target digit
+    document.getElementById('targetDigit').addEventListener('change', function() {
+        updateTargetPattern();
+    });
+
+    // Add reset stats button handler
+    document.getElementById('resetStats').addEventListener('click', function() {
+        resetStats();
+    });
+
+    // Show stats card when connected
+    document.getElementById('statsCard').style.display = 'block';
+});
+
+// Add pattern input handling
+document.getElementById('patternLength').addEventListener('change', function() {
+    const patternInputs = document.getElementById('patternInputs');
+    const patternFields = patternInputs.querySelector('.pattern-fields');
+    const length = parseInt(this.value);
+    
+    // Clear existing fields
+    patternFields.innerHTML = '';
+    
+    if (length > 0) {
+        patternInputs.style.display = 'block';
+        
+        // Create input fields based on length
+        for (let i = 0; i < length; i++) {
+            const div = document.createElement('div');
+            div.className = 'pattern-digit-container';
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'form-control pattern-digit';
+            input.min = 0;
+            input.max = 9;
+            input.value = 0;
+            input.style.width = '60px';
+            input.setAttribute('data-position', i);
+            
+            const label = document.createElement('div');
+            label.className = 'pattern-digit-label text-gold-secondary';
+            label.textContent = `Digit ${i + 1}`;
+            
+            // Add validation
+            input.addEventListener('input', function() {
+                let value = parseInt(this.value);
+                if (isNaN(value) || value < 0) {
+                    this.value = 0;
+                } else if (value > 9) {
+                    this.value = 9;
+                }
+            });
+            
+            div.appendChild(label);
+            div.appendChild(input);
+            patternFields.appendChild(div);
+        }
+    } else {
+        patternInputs.style.display = 'none';
+    }
+});
+
+// Add target digit selection handler
+document.getElementById('targetDigit').addEventListener('change', function() {
+    const singleDigitDiv = document.getElementById('singleDigitDiv');
+    const patternInputs = document.getElementById('patternInputs');
+    
+    switch(this.value) {
+        case 'pattern':
+            singleDigitDiv.style.display = 'none';
+            if (document.getElementById('patternLength').value > 0) {
+                patternInputs.style.display = 'block';
+            }
+            logActivity('Using pattern-based target digit', 'info');
+            break;
+        case 'single':
+            singleDigitDiv.style.display = 'block';
+            patternInputs.style.display = 'none';
+            logActivity('Using single digit target', 'info');
+            break;
+        case 'random':
+            singleDigitDiv.style.display = 'none';
+            patternInputs.style.display = 'none';
+            logActivity('Using random digit target', 'info');
+            break;
+    }
+});
+
+// Add single digit validation
+document.getElementById('singleDigit').addEventListener('input', function() {
+    let value = parseInt(this.value);
+    if (isNaN(value) || value < 0) {
+        this.value = 0;
+    } else if (value > 9) {
+        this.value = 9;
+    }
+});
+
+// Function to get random digit (0-9)
+function getRandomDigit() {
+    return Math.floor(Math.random() * 10);
+}
+
+// Function to get target digit based on selected mode
+function getTargetDigit() {
+    const mode = document.getElementById('targetDigit').value;
+    switch(mode) {
+        case 'pattern':
+            // Get last digit from pattern sequence
+            const patternInputs = document.querySelectorAll('.pattern-digit');
+            return patternInputs.length > 0 ? parseInt(patternInputs[patternInputs.length - 1].value) : 5;
+        case 'single':
+            return parseInt(document.getElementById('singleDigit').value);
+        case 'random':
+            const randomDigit = getRandomDigit();
+            logActivity(`Random digit generated: ${randomDigit}`, 'info');
+            return randomDigit;
+        default:
+            return 5;
+    }
+}
+
+// Recovery strategy toggle handlers
+document.getElementById('usePrimaryRecovery').addEventListener('change', function() {
+    const primarySettings = document.getElementById('primaryRecoverySettings');
+    primarySettings.style.display = this.checked ? 'block' : 'none';
+    
+    if (this.checked) {
+        // Only disable Martingale
+        document.getElementById('useMartingale').checked = false;
+        document.getElementById('martingaleSettings').style.display = 'none';
+        logActivity('Primary Recovery enabled', 'info');
+    }
+});
+
+document.getElementById('useSecondaryRecovery').addEventListener('change', function() {
+    const secondarySettings = document.getElementById('secondaryRecoverySettings');
+    secondarySettings.style.display = this.checked ? 'block' : 'none';
+    
+    if (this.checked) {
+        // Only disable Martingale
+        document.getElementById('useMartingale').checked = false;
+        document.getElementById('martingaleSettings').style.display = 'none';
+        logActivity('Secondary Recovery enabled', 'info');
+    }
+});
+
+document.getElementById('useMartingale').addEventListener('change', function() {
+    const martingaleSettings = document.getElementById('martingaleSettings');
+    martingaleSettings.style.display = this.checked ? 'block' : 'none';
+    
+    if (this.checked) {
+        // Disable both recovery strategies when enabling Martingale
+        document.getElementById('usePrimaryRecovery').checked = false;
+        document.getElementById('primaryRecoverySettings').style.display = 'none';
+        document.getElementById('useSecondaryRecovery').checked = false;
+        document.getElementById('secondaryRecoverySettings').style.display = 'none';
+        logActivity('Martingale Strategy enabled', 'info');
+    }
+});
+
+// Add visual feedback for combined strategies
+function updateRecoveryStatus() {
+    const primaryEnabled = document.getElementById('usePrimaryRecovery').checked;
+    const secondaryEnabled = document.getElementById('useSecondaryRecovery').checked;
+    
+    if (primaryEnabled && secondaryEnabled) {
+        logActivity('Both recovery strategies active - Primary will attempt first, Secondary as backup', 'info');
+    }
+}
+
+// Add the status update to both toggle handlers
+document.getElementById('usePrimaryRecovery').addEventListener('change', updateRecoveryStatus);
+document.getElementById('useSecondaryRecovery').addEventListener('change', updateRecoveryStatus);
+
+// Recovery digit validation
+document.getElementById('recoveryDigit').addEventListener('input', function() {
+    let value = parseInt(this.value);
+    if (isNaN(value) || value < 0) {
+        this.value = 0;
+    } else if (value > 9) {
+        this.value = 9;
+    }
+});
+
+// Recovery multiplier validation
+document.getElementById('recoveryMultiplier').addEventListener('input', function() {
+    let value = parseFloat(this.value);
+    if (isNaN(value) || value < 1.1) {
+        this.value = 1.1;
+    }
+});
+
+// Recovery attempts validation
+document.getElementById('recoveryAttempts').addEventListener('input', function() {
+    let value = parseInt(this.value);
+    if (isNaN(value) || value < 1) {
+        this.value = 1;
+    } else if (value > 10) {
+        this.value = 10;
+    }
+});
+
+// Validation for secondary recovery inputs
+document.getElementById('secondaryRecoveryDigit').addEventListener('input', function() {
+    let value = parseInt(this.value);
+    if (isNaN(value) || value < 0) {
+        this.value = 0;
+    } else if (value > 9) {
+        this.value = 9;
+    }
+});
+
+document.getElementById('secondaryRecoveryMultiplier').addEventListener('input', function() {
+    let value = parseFloat(this.value);
+    if (isNaN(value) || value < 1.1) {
+        this.value = 1.1;
+    }
+});
+
+document.getElementById('secondaryRecoveryAttempts').addEventListener('input', function() {
+    let value = parseInt(this.value);
+    if (isNaN(value) || value < 1) {
+        this.value = 1;
+    } else if (value > 10) {
+        this.value = 10;
+    }
+});
+
+// Recovery state tracking
+let recoveryState = {
+    isInRecovery: false,
+    currentStrategy: null, // 'primary' or 'secondary'
+    primaryAttempts: 0,
+    secondaryAttempts: 0,
+    originalStake: 0,
+    originalType: null,
+    originalDigit: null,
+    totalLoss: 0
+};
+
+// Function to handle trade result and recovery
+function handleTradeResult(result, profit) {
+    const currentDigit = lastDigits[lastDigits.length - 1];
+    const targetDigit = document.getElementById('singleDigit').value;
+    const tradeType = document.getElementById('tradeType').value;
+    
+    let resultMessage = `Trade ${result}: ${tradeType} ${targetDigit}`;
+    if (currentDigit !== undefined) {
+        resultMessage += ` (Last digit: ${currentDigit})`;
+    }
+    resultMessage += ` [${profit > 0 ? '+' : ''}${profit.toFixed(2)}]`;
+    
+    logActivity(resultMessage, result === 'win' ? 'success' : 'error');
+    
+    // Handle recovery if needed
+    if (result === 'loss' && (document.getElementById('usePrimaryRecovery').checked || 
+                             document.getElementById('useSecondaryRecovery').checked)) {
+        handleTradeRecovery(result, profit);
+    }
+}
+
+// Function to execute primary recovery
+function executePrimaryRecovery() {
+    const recoveryType = document.getElementById('recoveryType').value;
+    const recoveryDigit = parseInt(document.getElementById('recoveryDigit').value);
+    const multiplier = parseFloat(document.getElementById('recoveryMultiplier').value);
+    const stake = recoveryState.originalStake * Math.pow(multiplier, recoveryState.primaryAttempts);
+    
+    logActivity(`Primary Recovery Attempt ${recoveryState.primaryAttempts}: ${recoveryType} ${recoveryDigit} with $${stake.toFixed(2)}`, 'info');
+    
+    // Place recovery trade
+    placeTrade({
+        type: recoveryType,
+        digit: recoveryDigit,
+        stake: stake
+    });
+}
+
+// Function to execute secondary recovery
+function executeSecondaryRecovery() {
+    const recoveryType = document.getElementById('secondaryRecoveryType').value;
+    const recoveryDigit = parseInt(document.getElementById('secondaryRecoveryDigit').value);
+    const multiplier = parseFloat(document.getElementById('secondaryRecoveryMultiplier').value);
+    const stake = recoveryState.originalStake * Math.pow(multiplier, recoveryState.secondaryAttempts);
+    
+    logActivity(`Secondary Recovery Attempt ${recoveryState.secondaryAttempts}: ${recoveryType} ${recoveryDigit} with $${stake.toFixed(2)}`, 'info');
+    
+    // Place recovery trade
+    placeTrade({
+        type: recoveryType,
+        digit: recoveryDigit,
+        stake: stake
+    });
+}
+
+// Function to reset recovery state
+function resetRecoveryState() {
+    recoveryState = {
+        isInRecovery: false,
+        currentStrategy: null,
+        primaryAttempts: 0,
+        secondaryAttempts: 0,
+        originalStake: 0,
+        originalType: null,
+        originalDigit: null,
+        totalLoss: 0
+    };
+    
+    // Return to original trading parameters
+    if (recoveryState.originalType && recoveryState.originalDigit !== null) {
+        logActivity('Returning to original trading strategy', 'info');
+    }
+}
+
+// Add check for stop loss
+function checkStopLoss(nextStake) {
+    const primaryStopLoss = parseFloat(document.getElementById('recoveryStopLoss').value);
+    const secondaryStopLoss = parseFloat(document.getElementById('secondaryRecoveryStopLoss').value);
+    const currentStopLoss = recoveryState.currentStrategy === 'primary' ? primaryStopLoss : secondaryStopLoss;
+    
+    if (recoveryState.totalLoss + nextStake > currentStopLoss) {
+        logActivity(`Stop loss limit reached! Recovery stopped at $${recoveryState.totalLoss.toFixed(2)} loss`, 'error');
+        resetRecoveryState();
+        return false;
+    }
+    return true;
+}
+
+// Update handleNonPatternTrade function
+function handleNonPatternTrade(currentDigit) {
+    const tradeType = document.getElementById('tradeType').value;
+    const targetDigit = parseInt(document.getElementById('targetDigitValue').value);
+    
+    // Validate target digit
+    if (isNaN(targetDigit) || targetDigit < 0 || targetDigit > 9) {
+        logActivity('Invalid target digit. Must be between 0 and 9.', 'error');
+        return;
+    }
+    
+    const stake = parseFloat(document.getElementById('stakeAmount').value);
+    
+    logActivity(`Trading ${tradeType} ${targetDigit} (Current: ${currentDigit})`, 'info');
+    placeTrade({
+        type: tradeType,
+        digit: targetDigit,
+        stake: stake
+    });
+}
+
+// Add new function to update digit history
+function updateDigitHistory(digit) {
+    digitHistory.unshift(digit);
+    if (digitHistory.length > MAX_HISTORY) {
+        digitHistory.pop();
+    }
+    
+    const container = document.getElementById('digitHistory');
+    container.innerHTML = '';
+    
+    const pattern = getCurrentPattern();
+    
+    digitHistory.forEach((d, index) => {
+        const box = document.createElement('div');
+        box.className = 'digit-box';
+        box.textContent = d;
+        
+        // Check if this digit is part of a pattern match
+        if (pattern.length > 0 && index < pattern.length) {
+            if (d === pattern[index]) {
+                box.classList.add('highlight');
+            }
+        }
+        
+        container.appendChild(box);
+    });
+}
+
+// Add function to get current pattern sequence
+function getCurrentPattern() {
+    const patternInputs = document.querySelectorAll('.pattern-digit');
+    let pattern = [];
+    patternInputs.forEach(input => {
+        pattern.push(input.value);
+    });
+    return pattern;
+}
+
+// Update the target pattern display function
+function updateTargetPattern() {
+    const patternDisplay = document.getElementById('targetPattern');
+    const patternLength = parseInt(document.getElementById('patternLength').value);
+    const targetDigit = document.getElementById('targetDigitValue').value;
+    const tradeType = document.getElementById('tradeType').value.toUpperCase();
+    
+    if (patternLength === 0) {
+        // Display for direct trading mode
+        patternDisplay.textContent = `Direct ${tradeType} ${targetDigit}`;
+    } else {
+        // Display for pattern mode
+        const pattern = getCurrentPattern();
+        if (pattern.length > 0) {
+            patternDisplay.textContent = `${pattern.join(' → ')} → ${tradeType} ${targetDigit}`;
+        } else {
+            patternDisplay.textContent = 'No Pattern Set';
+        }
+    }
+}
+
+// Update the pattern digit input creation
+function createPatternInputs(count) {
+    const container = document.querySelector('.pattern-fields');
+    container.innerHTML = '';
+    
+    for (let i = 0; i < count; i++) {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.className = 'form-control pattern-digit';
+        input.min = 0;
+        input.max = 9;
+        input.value = 0;
+        input.setAttribute('data-position', i);
+        
+        // Add change event listener
+        input.addEventListener('change', function() {
+            let value = parseInt(this.value);
+            if (isNaN(value) || value < 0) {
+                this.value = 0;
+            } else if (value > 9) {
+                this.value = 9;
+            }
+            updateTargetPattern();
+        });
+        
+        container.appendChild(input);
+    }
+    updateTargetPattern();
+}
+
+// Update pattern sequence handler
+document.getElementById('patternSequence').addEventListener('change', function() {
+    const count = parseInt(this.value);
+    if (count > 0) {
+        createPatternInputs(count);
+        document.getElementById('patternFields').style.display = 'block';
+    } else {
+        document.getElementById('patternFields').style.display = 'none';
+        document.querySelector('.pattern-fields').innerHTML = '';
+        updateTargetPattern();
+    }
+});
+
+// Add function to update stats display
+function updateStatsDisplay() {
+    document.getElementById('totalTrades').textContent = tradingStats.totalTrades.toString();
+    document.getElementById('totalWins').textContent = tradingStats.wins.toString();
+    document.getElementById('totalLosses').textContent = tradingStats.losses.toString();
+    
+    const profitLossText = (tradingStats.profitLoss >= 0 ? '+' : '') + 
+                          tradingStats.profitLoss.toFixed(2) + ' USD';
+    const profitLossElement = document.getElementById('totalProfitLoss');
+    profitLossElement.textContent = profitLossText;
+    
+    profitLossElement.className = 'stat-value ' + 
+        (tradingStats.profitLoss > 0 ? 'text-success' : 
+         tradingStats.profitLoss < 0 ? 'text-danger' : '');
+}
+
+// Add function to reset stats
+function resetStats() {
+    tradingStats.totalTrades = 0;
+    tradingStats.wins = 0;
+    tradingStats.losses = 0;
+    tradingStats.profitLoss = 0;
+    updateStatsDisplay();
+    logActivity('Trading statistics reset', 'warning');
+}
+</script>
+{% endblock %}
+
+{% endblock %} 

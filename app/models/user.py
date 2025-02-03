@@ -25,6 +25,7 @@ class User(UserMixin, db.Model):
     precision_master_approved = db.Column(db.Boolean, default=False)
     trend_warrior_approved = db.Column(db.Boolean, default=False)
     pattern_hunter_approved = db.Column(db.Boolean, default=False)
+    courage_flux_approved = db.Column(db.Boolean, default=False)
     
     # Relationships
     bots = db.relationship('Bot', backref='user', lazy=True)

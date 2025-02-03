@@ -211,6 +211,348 @@
         border-color: rgba(255, 59, 48, 0.8);
         color: rgba(255, 59, 48, 1);
     }
+
+    /* Enhanced neon glowing effect */
+    @keyframes neonPulse {
+        0% {
+            box-shadow: 
+                0 0 7px #fff,
+                0 0 10px #fff,
+                0 0 21px #fff,
+                0 0 42px var(--neon-color),
+                0 0 82px var(--neon-color),
+                0 0 92px var(--neon-color),
+                0 0 102px var(--neon-color),
+                0 0 151px var(--neon-color);
+        }
+        50% {
+            box-shadow: 
+                0 0 4px #fff,
+                0 0 7px #fff,
+                0 0 13px #fff,
+                0 0 26px var(--neon-color),
+                0 0 52px var(--neon-color),
+                0 0 62px var(--neon-color),
+                0 0 72px var(--neon-color),
+                0 0 91px var(--neon-color);
+        }
+        100% {
+            box-shadow: 
+                0 0 7px #fff,
+                0 0 10px #fff,
+                0 0 21px #fff,
+                0 0 42px var(--neon-color),
+                0 0 82px var(--neon-color),
+                0 0 92px var(--neon-color),
+                0 0 102px var(--neon-color),
+                0 0 151px var(--neon-color);
+        }
+    }
+
+    .btn-active-trading {
+        animation: neonPulse 1.5s infinite;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Specific neon colors for Rise/Fall buttons */
+    #buyRiseBtn.btn-active-trading {
+        --neon-color: #00ff95;
+        text-shadow: 0 0 7px #fff,
+                     0 0 10px #fff,
+                     0 0 21px #fff,
+                     0 0 42px #00ff95,
+                     0 0 82px #00ff95,
+                     0 0 92px #00ff95,
+                     0 0 102px #00ff95,
+                     0 0 151px #00ff95;
+    }
+
+    #buyFallBtn.btn-active-trading {
+        --neon-color: #ff0055;
+        text-shadow: 0 0 7px #fff,
+                     0 0 10px #fff,
+                     0 0 21px #fff,
+                     0 0 42px #ff0055,
+                     0 0 82px #ff0055,
+                     0 0 92px #ff0055,
+                     0 0 102px #ff0055,
+                     0 0 151px #ff0055;
+    }
+
+    /* Add a subtle background glow effect */
+    .btn-active-trading::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+            circle at center,
+            var(--neon-color) 0%,
+            transparent 70%
+        );
+        opacity: 0.15;
+        z-index: -1;
+        border-radius: inherit;
+    }
+
+    /* Enhance button text visibility during active state */
+    .btn-active-trading i,
+    .btn-active-trading span {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Add glowing red effect for continuous trading checkbox */
+    .form-check-input:checked {
+        background-color: #ff0055;
+        border-color: #ff0055;
+        box-shadow: 0 0 10px #ff0055;
+    }
+
+    .form-check-input:checked:focus {
+        background-color: #ff0055;
+        border-color: #ff0055;
+        box-shadow: 0 0 15px #ff0055;
+    }
+
+    /* Update continuous trading text styles */
+    .continuous-trading-container {
+        padding: 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .continuous-trading-container .form-check-label {
+        color: #ffffff !important; /* Brighter white for main label */
+        font-weight: 500;
+    }
+
+    .continuous-trading-container .form-text {
+        color: rgba(255, 255, 255, 0.9) !important; /* Brighter description text */
+    }
+
+    .continuous-trading-container.active {
+        background: rgba(255, 0, 85, 0.1);
+        border: 1px solid rgba(255, 0, 85, 0.2);
+    }
+
+    .continuous-trading-container.active .form-check-label {
+        color: #ff6b97 !important; /* Bright pink when active */
+    }
+
+    .continuous-trading-container.active .form-text {
+        color: #ffa5c0 !important; /* Lighter pink for description when active */
+    }
+
+    /* Update the pulsing animation with brighter colors */
+    @keyframes warningPulse {
+        0% {
+            color: #ff6b97 !important;
+            text-shadow: 0 0 7px #ff0055;
+        }
+        50% {
+            color: #ffa5c0 !important;
+            text-shadow: 0 0 12px #ff0055;
+        }
+        100% {
+            color: #ff6b97 !important;
+            text-shadow: 0 0 7px #ff0055;
+        }
+    }
+
+    .continuous-trading-active {
+        animation: warningPulse 2s infinite;
+        font-weight: 600 !important;
+    }
+
+    /* Martingale styles */
+    .martingale-container {
+        padding: 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        background: rgba(0, 0, 0, 0.2);
+        margin-top: 10px;
+    }
+
+    .martingale-container.active {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.2);
+    }
+
+    .martingale-container .form-check-label {
+        color: #ffffff !important;
+        font-weight: 500;
+    }
+
+    .martingale-container.active .form-check-label {
+        color: #ffd54f !important;
+    }
+
+    .martingale-settings {
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    /* Martingale checkbox style */
+    .martingale-container .form-check-input:checked {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        box-shadow: 0 0 10px #ffc107;
+    }
+
+    .martingale-container .form-check-input:checked:focus {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        box-shadow: 0 0 15px #ffc107;
+    }
+
+    @keyframes martingalePulse {
+        0% {
+            color: #ffd54f !important;
+            text-shadow: 0 0 7px #ffc107;
+        }
+        50% {
+            color: #ffe082 !important;
+            text-shadow: 0 0 12px #ffc107;
+        }
+        100% {
+            color: #ffd54f !important;
+            text-shadow: 0 0 7px #ffc107;
+        }
+    }
+
+    .martingale-active {
+        animation: martingalePulse 2s infinite;
+        font-weight: 600 !important;
+    }
+
+    /* Add styles for the stats */
+    .stat-item {
+        text-align: center;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .stat-item label {
+        font-size: 0.9rem;
+        color: #888;
+        margin-bottom: 5px;
+    }
+    
+    .stat-item .stat-value {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    
+    .text-success { color: #69f0ae !important; }
+    .text-danger { color: #ff5252 !important; }
+
+    .trade-stats-container {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 10;
+        position: relative;
+    }
+
+    .trade-stats-container .stat-label {
+        font-size: 1rem;
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .trade-stats-container .stat-counts {
+        font-size: 0.9rem;
+        padding: 5px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
+
+    .trade-stats-container .stat-value {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .price-display {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+    }
+
+    .price-label {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 5px;
+    }
+
+    .price-value {
+        font-size: 2rem;
+        font-weight: 700;
+        font-family: 'Consolas', monospace;
+        color: #69f0ae;
+        text-shadow: 0 0 10px rgba(105, 240, 174, 0.5);
+    }
+
+    .price-currency {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.5);
+        margin-left: 5px;
+    }
+
+    .price-movement {
+        font-size: 1rem;
+        margin-left: 10px;
+    }
+
+    .price-up {
+        color: #69f0ae;
+    }
+
+    .price-down {
+        color: #ff4081;
+    }
+
+    .last-digit {
+        font-size: 2.5rem;
+        font-weight: 800;
+        font-family: 'Consolas', monospace;
+        padding: 0.2rem 0.8rem;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.4);
+        margin-left: 10px;
+        display: inline-block;
+        min-width: 3rem;
+        text-align: center;
+    }
+
+    .last-digit-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        display: block;
+        margin-bottom: 2px;
+    }
+
+    .digit-even {
+        color: #69f0ae;
+        text-shadow: 0 0 10px rgba(105, 240, 174, 0.5);
+    }
+
+    .digit-odd {
+        color: #ff4081;
+        text-shadow: 0 0 10px rgba(255, 64, 129, 0.5);
+    }
 </style>
 {% endblock %}
 
@@ -218,6 +560,7 @@
 <div class="container py-4">
     <div class="row">
         <div class="col-md-8 mx-auto">
+            <!-- API Connection Card -->
             <div class="card api-card mb-4">
                 <div class="card-body">
                     <h3 class="card-title">CourageFX Trend Warrior</h3>
@@ -289,48 +632,32 @@
                 </div>
             </div>
 
-            <!-- Trading Controls -->
-            <div class="card api-card mb-4" id="tradingSection" style="display: none;">
+            <!-- Activity Log Card -->
+            <div class="card api-card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title mb-4">Trend Warrior Trading Bot</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Activity Log</h5>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="clearLog()">
+                            <i class="bx bx-trash"></i> Clear Log
+                        </button>
+                    </div>
+                    <div id="activityLog" class="activity-log">
+                        <!-- Log entries will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual Trading Controls -->
+            <div class="card api-card mb-4" id="manualTradingSection" style="display: none;">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Manual Trading</h5>
                     
                     <div class="trading-controls">
                         <div class="trade-params">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Stake Amount</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" id="stakeAmount" value="1" min="1" step="0.1">
-                                        <span class="input-group-text" id="stakeCurrency">USD</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Duration</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" id="duration" value="5" min="1">
-                                        <select class="form-select" id="durationType" style="max-width: 110px;">
-                                            <option value="t">Ticks</option>
-                                            <option value="m">Minutes</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-text text-white-50">
-                                        <span id="durationHelp">Ticks: 1-10 | Minutes: 1-60</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Trading Strategy</label>
-                                    <select class="form-control" id="tradingStrategy">
-                                        <option value="trend">Trend Following</option>
-                                        <option value="alternating">Counter Trend</option>
-                                        <option value="martingale">Martingale</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
                                     <label class="form-label">Market</label>
-                                    <select class="form-control" id="market">
+                                    <select class="form-control" id="manualMarket">
                                         <optgroup label="1 Second Volatility">
                                             <option value="1HZ10V">Volatility 10 (1s)</option>
                                             <option value="1HZ25V">Volatility 25 (1s)</option>
@@ -345,77 +672,216 @@
                                             <option value="R_75">Volatility 75</option>
                                             <option value="R_100">Volatility 100</option>
                                         </optgroup>
-                                        <optgroup label="Crash/Boom">
-                                            <option value="CRASH_1000">Crash 1000</option>
-                                            <option value="BOOM_1000">Boom 1000</option>
-                                            <option value="CRASH_500">Crash 500</option>
-                                            <option value="BOOM_500">Boom 500</option>
-                                        </optgroup>
                                     </select>
-                                    <div class="form-text text-white-50">
-                                        Select market type and volatility level
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="price-display">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <div class="price-label">Current Price</div>
+                                                <div>
+                                                    <span class="price-value" id="currentPrice">0.00</span>
+                                                    <span class="price-movement" id="priceMovement">
+                                                        <i class="bx bx-trending-up price-up"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <span class="last-digit-label">Last Digit</span>
+                                                <span class="last-digit" id="lastDigit">0</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center mt-4">
-                            <div class="btn-group">
-                                <button class="btn btn-success btn-lg" id="startBot">
-                                    <i class="bx bx-trending-up me-2"></i> Start Trend Warrior
-                                </button>
-                                <button class="btn btn-danger btn-lg" id="stopBot" disabled>
-                                    <i class="bx bx-stop me-2"></i> Stop Trading
-                                </button>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Stake Amount</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="manualStakeAmount" 
+                                               value="1" min="0.35" step="0.01">
+                                        <span class="input-group-text" id="manualStakeCurrency">USD</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="autoAdjustStake">
-                                <label class="form-check-label">Auto-adjust stake</label>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Duration</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="manualDuration" 
+                                               value="5" min="1">
+                                        <select class="form-select" id="manualDurationType">
+                                            <option value="t">Ticks</option>
+                                            <option value="s">Seconds</option>
+                                            <option value="m">Minutes</option>
+                                            <option value="h">Hours</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Current Spot</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="currentSpotPrice" 
+                                               readonly value="0.00">
+                                        <span class="input-group-text">
+                                            <i class="bx bx-trending-up text-success"></i>
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Trading Stats -->
-                    <div class="row mt-4">
-                        <div class="col-md-3">
-                            <div class="stats-card text-center">
-                                <div class="stats-value" id="totalTrades">0</div>
-                                <div class="stats-label">Total Trades</div>
+
+                            <!-- Manual Trading Buttons -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="d-flex gap-3">
+                                        <div class="d-flex flex-column flex-grow-1">
+                                            <div class="trade-stats-container text-center">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <div class="stat-label text-success">Rise Trades: <span class="stat-value" id="riseTradeCount">0</span></div>
+                                                    <button class="btn btn-outline-warning btn-sm" onclick="resetRiseStats()">
+                                                        <i class="bx bx-refresh"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="stat-counts">
+                                                    <span class="text-success">Won: <span class="stat-value" id="riseWinCount">0</span></span>
+                                                    <span class="mx-2">|</span>
+                                                    <span class="text-danger">Lost: <span class="stat-value" id="riseLossCount">0</span></span>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-success py-3" id="buyRiseBtn">
+                                                <i class="bx bx-trending-up me-2"></i>
+                                                Rise
+                                            </button>
+                                        </div>
+                                        <div class="d-flex flex-column flex-grow-1">
+                                            <div class="trade-stats-container text-center">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <div class="stat-label text-danger">Fall Trades: <span class="stat-value" id="fallTradeCount">0</span></div>
+                                                    <button class="btn btn-outline-warning btn-sm" onclick="resetFallStats()">
+                                                        <i class="bx bx-refresh"></i>
+                                                    </button>
+                                                </div>
+                                                <div class="stat-counts">
+                                                    <span class="text-success">Won: <span class="stat-value" id="fallWinCount">0</span></span>
+                                                    <span class="mx-2">|</span>
+                                                    <span class="text-danger">Lost: <span class="stat-value" id="fallLossCount">0</span></span>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-danger py-3" id="buyFallBtn">
+                                                <i class="bx bx-trending-down me-2"></i>
+                                                Fall
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card text-center">
-                                <div class="stats-value profit" id="winCount">0</div>
-                                <div class="stats-label">Wins</div>
+
+                            <!-- Last Trade Info -->
+                            <div class="mt-4 p-3 rounded" style="background: rgba(0, 0, 0, 0.2);">
+                                <h6 class="mb-3">Last Trade</h6>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <small class="d-block text-muted">Result</small>
+                                        <span id="lastTradeResult" class="h5">-</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="d-block text-muted">Profit/Loss</small>
+                                        <span id="lastTradePnL" class="h5">0.00 USD</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="d-block text-muted">Total P/L</small>
+                                        <span id="totalPnL" class="h5">0.00 USD</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card text-center">
-                                <div class="stats-value loss" id="lossCount">0</div>
-                                <div class="stats-label">Losses</div>
+
+                            <!-- Update the continuous trading section HTML -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="continuous-trading-container" id="continuousTradingContainer">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="continuousTrading">
+                                            <label class="form-check-label text-white" id="continuousTradingLabel">Continuous Trading</label>
+                                            <small class="form-text d-block">Automatically place trades in the same direction after each completion</small>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card text-center">
-                                <div class="stats-value" id="profitLoss">0.00</div>
-                                <div class="stats-label">Profit/Loss</div>
+
+                            <!-- Add this after the continuous trading container -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="martingale-container" id="martingaleContainer" style="display: none;">
+                                        <div class="form-check form-switch mb-2">
+                                            <input class="form-check-input" type="checkbox" id="martingaleEnabled">
+                                            <label class="form-check-label text-white" id="martingaleLabel">Martingale Strategy</label>
+                                            <small class="form-text d-block">Automatically increase stake after losses, reset after wins</small>
+                                        </div>
+                                        <div class="martingale-settings" style="display: none;">
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">Base Stake</span>
+                                                <input type="number" class="form-control" id="martingaleBaseStake" value="1" min="0.35" step="0.01">
+                                                <span class="input-group-text">USD</span>
+                                            </div>
+                                            <div class="input-group mb-2">
+                                                <span class="input-group-text">Multiplier</span>
+                                                <input type="number" class="form-control" id="martingaleMultiplier" value="2" min="1.1" step="0.1">
+                                                <span class="input-group-text">x</span>
+                                            </div>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Max Steps</span>
+                                                <input type="number" class="form-control" id="martingaleMaxSteps" value="3" min="1" max="10">
+                                                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="tooltip" title="Maximum number of consecutive martingale increases">
+                                                    <i class="bx bx-info-circle"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Activity Log Card -->
-            <div class="card api-card">
+            <!-- Trading Stats Card -->
+            <div class="card api-card mb-4" id="tradingStats" style="display: none;">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="card-title mb-0">Activity Log</h5>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="clearLog()">
-                            <i class="bx bx-trash"></i> Clear Log
+                        <h5 class="card-title mb-0">Trading Statistics</h5>
+                        <button class="btn btn-outline-warning btn-sm" id="refreshStats">
+                            <i class="bx bx-refresh me-1"></i>Reset Stats
                         </button>
                     </div>
-                    <div id="activityLog" class="activity-log">
-                        <!-- Log entries will be added here -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label class="text-muted mb-2">Total Trades</label>
+                                <div class="stat-value" id="totalTrades">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label class="text-muted mb-2">Wins</label>
+                                <div class="stat-value text-success" id="winCount">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label class="text-muted mb-2">Losses</label>
+                                <div class="stat-value text-danger" id="lossCount">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label class="text-muted mb-2">Profit/Loss</label>
+                                <div class="stat-value" id="profitLoss">0.00</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -429,12 +895,6 @@
 let ws = null;
 let isTrading = false;
 let currentContract = null;
-let tradingStats = {
-    totalTrades: 0,
-    wins: 0,
-    losses: 0,
-    profitLoss: 0
-};
 
 // Add prediction type constants
 const PREDICTIONS = {
@@ -442,47 +902,423 @@ const PREDICTIONS = {
     FALL: 'PUT'
 };
 
+// Add subscription tracking
+let activeSubscriptions = {
+    contract: null,
+    ticks: null
+};
+
+// Add these variables at the top with other global variables
+let isContinuousTrading = false;
+let continuousDirection = null;
+let isWaitingForCompletion = false;
+
+// Add a variable to track total P/L
+let totalProfitLoss = 0;
+
+// Add these variables at the top with other global variables
+let martingaleEnabled = false;
+let currentStake = 0;
+let consecutiveLosses = 0;
+let baseStake = 0;
+
+let lastPrice = 0;
+
+// Auto-connect functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Check for stored API token
-    const storedToken = localStorage.getItem('deriv_api_token');
-    if (storedToken) {
-        document.getElementById('apiToken').value = storedToken;
-        // Auto-connect if token exists
-        document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+    // Check for saved token
+    const savedToken = localStorage.getItem('deriv_api_token');
+    if (savedToken) {
+        document.getElementById('apiToken').value = savedToken;
+        console.log('Auto-connecting with saved token...');
+        // Automatically trigger the connection after a short delay
+        setTimeout(() => {
+            document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+            addLogEntry('Auto-connecting to Deriv...', 'info');
+        }, 1000);
     }
-    addLogEntry('Bot initialized and ready to connect', 'info');
+
+    // Add reconnection on visibility change
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            const token = localStorage.getItem('deriv_api_token');
+            if (token && (!ws || ws.readyState !== WebSocket.OPEN)) {
+                console.log('Tab visible, reconnecting...');
+                document.getElementById('apiToken').value = token;
+                document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+            }
+        }
+    });
+
+    // Add periodic connection check
+    setInterval(() => {
+        const token = localStorage.getItem('deriv_api_token');
+        if (token && (!ws || ws.readyState !== WebSocket.OPEN)) {
+            console.log('Connection check: reconnecting...');
+            document.getElementById('apiToken').value = token;
+            document.getElementById('apiForm').dispatchEvent(new Event('submit'));
+        }
+    }, 30000); // Check every 30 seconds
+
+    // Manual trading button handlers
+    document.getElementById('buyRiseBtn').addEventListener('click', function() {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            addLogEntry('Not connected to Deriv API', 'error');
+            return;
+        }
+
+        continuousDirection = 'CALL';
+        updateTradingButtonEffects();
+        placeTrade('CALL');
+    });
+
+    document.getElementById('buyFallBtn').addEventListener('click', function() {
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            addLogEntry('Not connected to Deriv API', 'error');
+            return;
+        }
+
+        continuousDirection = 'PUT';
+        updateTradingButtonEffects();
+        placeTrade('PUT');
+    });
+
+    // Market selection change handler
+    document.getElementById('manualMarket').addEventListener('change', function() {
+        subscribeToTicks(this.value);
+    });
+
+    // Initialize WebSocket connection when form is submitted
+    document.getElementById('apiForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const token = document.getElementById('apiToken').value;
+        
+        // Save token to localStorage
+        localStorage.setItem('deriv_api_token', token);
+        
+        // Close existing connection if any
+        if (ws) {
+            ws.close();
+        }
+        
+        ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1089');
+        
+        ws.onopen = function() {
+            console.log('WebSocket connected');
+            ws.send(JSON.stringify({ authorize: token }));
+            addLogEntry('Connecting to Deriv...', 'info');
+        };
+        
+        ws.onmessage = function(msg) {
+            const data = JSON.parse(msg.data);
+            console.log('WebSocket message:', data);
+            
+            if (data.error) {
+                // Ignore subscription errors
+                if (!data.error.message.includes('already subscribed')) {
+                    console.error('API Error:', data.error);
+                    addLogEntry(`Error: ${data.error.message}`, 'error');
+                    enableTradingButtons();
+                }
+                return;
+            }
+
+            // Store tick subscription ID
+            if (data.tick && data.tick.id) {
+                activeSubscriptions.ticks = data.tick.id;
+            }
+
+            // Handle other message types
+            if (data.authorize) {
+                handleAuthorization(data.authorize);
+            }
+
+            if (data.buy) {
+                handleBuy(data.buy);
+            }
+
+            if (data.proposal_open_contract) {
+                handleContract(data.proposal_open_contract);
+            }
+
+            if (data.tick) {
+                handleTick(data.tick);
+            }
+
+            if (data.balance) {
+                handleBalance(data.balance);
+            }
+        };
+
+        ws.onerror = function(error) {
+            console.error('WebSocket Error:', error);
+            addLogEntry('Connection error', 'error');
+        };
+
+        ws.onclose = function() {
+            console.log('WebSocket disconnected');
+            addLogEntry('Disconnected from Deriv', 'warning');
+        };
+    });
+
+    // Add continuous trading checkbox handler
+    document.getElementById('continuousTrading').addEventListener('change', function(e) {
+        const container = document.getElementById('continuousTradingContainer');
+        const label = document.getElementById('continuousTradingLabel');
+        
+        if (e.target.checked) {
+            container.classList.add('active');
+            label.classList.add('continuous-trading-active');
+        } else {
+            container.classList.remove('active');
+            label.classList.remove('continuous-trading-active');
+            resetTradingStates();
+        }
+    });
+
+    // Show martingale container when continuous trading is enabled
+    document.getElementById('continuousTrading').addEventListener('change', function(e) {
+        const martingaleContainer = document.getElementById('martingaleContainer');
+        martingaleContainer.style.display = e.target.checked ? 'block' : 'none';
+        if (!e.target.checked) {
+            document.getElementById('martingaleEnabled').checked = false;
+            resetMartingale();
+        }
+    });
+
+    // Martingale checkbox handler
+    document.getElementById('martingaleEnabled').addEventListener('change', function(e) {
+        const container = document.getElementById('martingaleContainer');
+        const label = document.getElementById('martingaleLabel');
+        const settings = document.querySelector('.martingale-settings');
+        
+        if (e.target.checked) {
+            container.classList.add('active');
+            label.classList.add('martingale-active');
+            settings.style.display = 'block';
+            martingaleEnabled = true;
+            baseStake = parseFloat(document.getElementById('martingaleBaseStake').value);
+            currentStake = baseStake;
+            // Update manual stake amount to match base stake
+            document.getElementById('manualStakeAmount').value = baseStake.toFixed(2);
+        } else {
+            container.classList.remove('active');
+            label.classList.remove('martingale-active');
+            settings.style.display = 'none';
+            resetMartingale();
+        }
+    });
 });
 
-document.getElementById('toggleToken').addEventListener('click', function() {
-    const input = document.getElementById('apiToken');
-    const icon = this.querySelector('i');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.remove('bx-show');
-        icon.classList.add('bx-hide');
-    } else {
-        input.type = 'password';
-        icon.classList.remove('bx-hide');
-        icon.classList.add('bx-show');
-    }
-});
+function handleAuthorization(auth) {
+    document.getElementById('accountInfo').style.display = 'block';
+    document.getElementById('manualTradingSection').style.display = 'block';
+    
+    document.getElementById('balanceAmount').textContent = auth.balance.toFixed(2);
+    document.getElementById('balanceCurrency').textContent = auth.currency;
+    document.getElementById('accountName').textContent = auth.email;
+    document.getElementById('accountType').textContent = auth.landing_company_name;
+    
+    document.getElementById('apiForm').style.display = 'none';
+    
+    addLogEntry('Successfully connected to Deriv', 'success');
+    
+    // Reset total P/L on new connection
+    totalProfitLoss = 0;
+    document.getElementById('totalPnL').textContent = '0.00 ' + auth.currency;
+    document.getElementById('totalPnL').className = 'h5';
+    
+    // Subscribe to balance updates and market ticks
+    ws.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+    subscribeToTicks(document.getElementById('manualMarket').value);
+}
 
-// Add logging functionality
+function handleBuy(buy) {
+    console.log('Buy confirmed:', buy);
+    addLogEntry(`Trade placed: ${buy.longcode}`, 'success');
+    enableTradingButtons();
+    
+    // Unsubscribe from previous contract if exists
+    if (activeSubscriptions.contract) {
+        ws.send(JSON.stringify({
+            forget: activeSubscriptions.contract
+        }));
+        activeSubscriptions.contract = null;
+    }
+    
+    // Subscribe to new contract updates
+    ws.send(JSON.stringify({
+        proposal_open_contract: 1,
+        contract_id: buy.contract_id,
+        subscribe: 1
+    }));
+}
+
+function handleContract(contract) {
+    if (contract.id) {
+        activeSubscriptions.contract = contract.id;
+    }
+
+    if (contract.status === 'won' || contract.status === 'lost') {
+        const pnl = parseFloat(contract.profit);
+        const status = contract.status.toUpperCase();
+        
+        // Update martingale stake if enabled
+        if (martingaleEnabled) {
+            updateMartingaleStake(status === 'WON');
+        }
+
+        // Update last trade display
+        document.getElementById('lastTradeResult').textContent = status;
+        document.getElementById('lastTradeResult').className = 
+            `h5 ${status === 'WON' ? 'text-success' : 'text-danger'}`;
+        
+        // Update single trade P/L
+        const pnlFormatted = `${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} ${contract.currency}`;
+        document.getElementById('lastTradePnL').textContent = pnlFormatted;
+        document.getElementById('lastTradePnL').className = 
+            `h5 ${pnl >= 0 ? 'text-success' : 'text-danger'}`;
+        
+        // Update total P/L
+        totalProfitLoss += pnl;
+        const totalPnLFormatted = `${totalProfitLoss >= 0 ? '+' : ''}${totalProfitLoss.toFixed(2)} ${contract.currency}`;
+        document.getElementById('totalPnL').textContent = totalPnLFormatted;
+        document.getElementById('totalPnL').className = 
+            `h5 ${totalProfitLoss >= 0 ? 'text-success' : 'text-danger'}`;
+
+        // Update direction-specific stats
+        if (contract.contract_type === 'CALL') {
+            tradingStats.riseTrades++;
+            document.getElementById('riseTradeCount').textContent = tradingStats.riseTrades;
+            
+            if (status === 'WON') {
+                tradingStats.riseWins++;
+                document.getElementById('riseWinCount').textContent = tradingStats.riseWins;
+            } else {
+                tradingStats.riseLosses++;
+                document.getElementById('riseLossCount').textContent = tradingStats.riseLosses;
+            }
+        } else if (contract.contract_type === 'PUT') {
+            tradingStats.fallTrades++;
+            document.getElementById('fallTradeCount').textContent = tradingStats.fallTrades;
+            
+            if (status === 'WON') {
+                tradingStats.fallWins++;
+                document.getElementById('fallWinCount').textContent = tradingStats.fallWins;
+            } else {
+                tradingStats.fallLosses++;
+                document.getElementById('fallLossCount').textContent = tradingStats.fallLosses;
+            }
+        }
+        
+        addLogEntry(
+            `Trade ${status}: ${pnlFormatted} (Total: ${totalPnLFormatted})`,
+            status === 'WON' ? 'success' : 'error'
+        );
+
+        // Unsubscribe from completed contract
+        if (activeSubscriptions.contract) {
+            ws.send(JSON.stringify({
+                forget: activeSubscriptions.contract
+            }));
+            activeSubscriptions.contract = null;
+        }
+
+        // Reset trading states
+        isWaitingForCompletion = false;
+        
+        // Check if continuous trading is enabled and place next trade
+        if (document.getElementById('continuousTrading').checked && continuousDirection) {
+            console.log('Continuous trading active, placing next trade...');
+            addLogEntry('Preparing next continuous trade...', 'info');
+            
+            setTimeout(() => {
+                if (document.getElementById('continuousTrading').checked) {
+                    placeTrade(continuousDirection);
+                } else {
+                    resetTradingStates();
+                }
+            }, 1500);
+        } else {
+            resetTradingStates();
+        }
+    }
+}
+
+function handleTick(tick) {
+    const currentPrice = tick.quote;
+    const priceDisplay = document.getElementById('currentPrice');
+    const movementDisplay = document.getElementById('priceMovement');
+    const lastDigitDisplay = document.getElementById('lastDigit');
+    
+    // Convert to string to preserve the exact format from Deriv
+    const priceString = currentPrice.toString();
+    
+    // Update price display with exact Deriv price
+    priceDisplay.textContent = priceString;
+    
+    // Update movement indicator
+    if (currentPrice > lastPrice) {
+        movementDisplay.innerHTML = '<i class="bx bx-trending-up price-up"></i>';
+        priceDisplay.style.color = '#69f0ae';
+    } else if (currentPrice < lastPrice) {
+        movementDisplay.innerHTML = '<i class="bx bx-trending-down price-down"></i>';
+        priceDisplay.style.color = '#ff4081';
+    }
+    
+    // Get the last digit from the exact price string
+    const lastDigit = priceString.charAt(priceString.length - 1);
+    lastDigitDisplay.textContent = lastDigit;
+    lastDigitDisplay.className = 'last-digit ' + (parseInt(lastDigit) % 2 === 0 ? 'digit-even' : 'digit-odd');
+    
+    lastPrice = currentPrice;
+    document.getElementById('currentSpotPrice').value = priceString;
+}
+
+function handleBalance(balance) {
+    document.getElementById('balanceAmount').textContent = balance.balance.toFixed(2);
+}
+
+function subscribeToTicks(symbol) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        // Unsubscribe from previous ticks if exists
+        if (activeSubscriptions.ticks) {
+            ws.send(JSON.stringify({
+                forget: activeSubscriptions.ticks
+            }));
+            activeSubscriptions.ticks = null;
+        }
+        
+        ws.send(JSON.stringify({
+            ticks: symbol,
+            subscribe: 1
+        }));
+    }
+}
+
+function disableTradingButtons() {
+    document.getElementById('buyRiseBtn').disabled = true;
+    document.getElementById('buyFallBtn').disabled = true;
+}
+
+function enableTradingButtons() {
+    document.getElementById('buyRiseBtn').disabled = false;
+    document.getElementById('buyFallBtn').disabled = false;
+}
+
 function addLogEntry(message, type = 'info') {
     const log = document.getElementById('activityLog');
     const entry = document.createElement('div');
-    entry.className = 'log-entry';
+    entry.className = `log-entry ${type}`;
     
     const time = new Date().toLocaleTimeString();
+    entry.innerHTML = `[${time}] ${message}`;
     
-    entry.innerHTML = `
-        <span class="log-time">[${time}]</span>
-        <span class="log-type log-type-${type}">${type.toUpperCase()}</span>
-        <span class="log-message">${message}</span>
-    `;
+    log.insertBefore(entry, log.firstChild);
     
-    log.appendChild(entry);
-    log.scrollTop = log.scrollHeight;
+    while (log.children.length > 100) {
+        log.removeChild(log.lastChild);
+    }
 }
 
 function clearLog() {
@@ -491,354 +1327,239 @@ function clearLog() {
     addLogEntry('Log cleared', 'info');
 }
 
+function placeTrade(direction) {
+    if (isWaitingForCompletion) {
+        console.log('Waiting for current trade to complete...');
+        return;
+    }
+    
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        addLogEntry('Not connected to Deriv API', 'error');
+        return;
+    }
+    
+    const market = document.getElementById('manualMarket').value;
+    let stake = martingaleEnabled ? 
+        currentStake : 
+        parseFloat(document.getElementById('manualStakeAmount').value);
+
+    // Validate minimum stake
+    if (stake < 0.35) {
+        addLogEntry('Please enter a stake amount that\'s at least 0.35.', 'error');
+        return;
+    }
+
+    const duration = document.getElementById('manualDuration').value;
+    const durationType = document.getElementById('manualDurationType').value;
+
+    const buyRequest = {
+        buy: "1",
+        subscribe: 1,
+        price: stake,
+        parameters: {
+            amount: stake,
+            basis: "stake",
+            contract_type: direction,
+            currency: "USD",
+            duration: parseInt(duration),
+            duration_unit: durationType,
+            symbol: market
+        }
+    };
+
+    console.log('Sending buy request:', buyRequest);
+    ws.send(JSON.stringify(buyRequest));
+    addLogEntry(`Placing ${direction} trade on ${market} for ${stake} USD`, 'info');
+    isWaitingForCompletion = true;
+    disableTradingButtons();
+    
+    // Update button effects for continuous trading
+    if (document.getElementById('continuousTrading').checked) {
+        continuousDirection = direction;
+        updateTradingButtonEffects();
+    }
+}
+
+function updateTradingButtonEffects() {
+    const riseBtn = document.getElementById('buyRiseBtn');
+    const fallBtn = document.getElementById('buyFallBtn');
+    
+    // Remove effects from both buttons first
+    riseBtn.classList.remove('btn-active-trading');
+    fallBtn.classList.remove('btn-active-trading');
+    
+    // Add effect to active button if continuous trading is on
+    if (document.getElementById('continuousTrading').checked && continuousDirection) {
+        if (continuousDirection === 'CALL') {
+            riseBtn.classList.add('btn-active-trading');
+        } else if (continuousDirection === 'PUT') {
+            fallBtn.classList.add('btn-active-trading');
+        }
+    }
+}
+
+// Add these functions
+function resetMartingale() {
+    martingaleEnabled = false;
+    consecutiveLosses = 0;
+    baseStake = parseFloat(document.getElementById('martingaleBaseStake').value);
+    currentStake = baseStake;
+    document.getElementById('manualStakeAmount').value = baseStake.toFixed(2);
+}
+
+function updateMartingaleStake(isWin) {
+    if (!martingaleEnabled) return;
+
+    if (isWin) {
+        // Reset on win
+        consecutiveLosses = 0;
+        currentStake = baseStake;
+    } else {
+        // Increase stake on loss
+        consecutiveLosses++;
+        const multiplier = parseFloat(document.getElementById('martingaleMultiplier').value);
+        const maxSteps = parseInt(document.getElementById('martingaleMaxSteps').value);
+        
+        if (consecutiveLosses <= maxSteps) {
+            currentStake = baseStake * Math.pow(multiplier, consecutiveLosses);
+        } else {
+            // Reset if max steps reached
+            resetMartingale();
+            addLogEntry('Maximum martingale steps reached. Resetting stake.', 'warning');
+        }
+    }
+    
+    // Update the manual stake amount field
+    document.getElementById('manualStakeAmount').value = currentStake.toFixed(2);
+}
+
+// Add base stake change handler
+document.getElementById('martingaleBaseStake').addEventListener('change', function(e) {
+    const value = parseFloat(e.target.value);
+    if (value < 0.35) {
+        e.target.value = "0.35";
+        addLogEntry('Minimum stake amount is 0.35 USD', 'warning');
+    }
+    if (martingaleEnabled) {
+        baseStake = parseFloat(e.target.value);
+        currentStake = baseStake;
+        document.getElementById('manualStakeAmount').value = baseStake.toFixed(2);
+    }
+});
+
+// Add clear stats button handler
+document.getElementById('refreshStats').addEventListener('click', function() {
+    resetTradingStats();
+});
+
+// Add trading stats object
+const tradingStats = {
+    totalTrades: 0,
+    wins: 0,
+    losses: 0,
+    profitLoss: 0,
+    riseTrades: 0,
+    riseWins: 0,
+    riseLosses: 0,
+    fallTrades: 0,
+    fallWins: 0,
+    fallLosses: 0
+};
+
+// Add function to reset trading stats
+function resetTradingStats() {
+    tradingStats.totalTrades = 0;
+    tradingStats.wins = 0;
+    tradingStats.losses = 0;
+    tradingStats.profitLoss = 0;
+    tradingStats.riseTrades = 0;
+    tradingStats.riseWins = 0;
+    tradingStats.riseLosses = 0;
+    tradingStats.fallTrades = 0;
+    tradingStats.fallWins = 0;
+    tradingStats.fallLosses = 0;
+    
+    // Reset all display counters
+    document.getElementById('riseTradeCount').textContent = '0';
+    document.getElementById('riseWinCount').textContent = '0';
+    document.getElementById('riseLossCount').textContent = '0';
+    document.getElementById('fallTradeCount').textContent = '0';
+    document.getElementById('fallWinCount').textContent = '0';
+    document.getElementById('fallLossCount').textContent = '0';
+    
+    updateStats();
+    addLogEntry('Trading statistics have been reset', 'warning');
+}
+
+// Update the stats display function
 function updateStats() {
     document.getElementById('totalTrades').textContent = tradingStats.totalTrades;
     document.getElementById('winCount').textContent = tradingStats.wins;
     document.getElementById('lossCount').textContent = tradingStats.losses;
     document.getElementById('profitLoss').textContent = tradingStats.profitLoss.toFixed(2);
     
-    // Update color of profit/loss
-    const plElement = document.getElementById('profitLoss');
-    plElement.className = 'stats-value ' + (tradingStats.profitLoss >= 0 ? 'profit' : 'loss');
-}
-
-function getNextPrediction(strategy, lastPrediction) {
-    switch(strategy) {
-        case 'alternating':
-            return lastPrediction === PREDICTIONS.RISE ? PREDICTIONS.FALL : PREDICTIONS.RISE;
-        case 'trend':
-            return lastPrediction || PREDICTIONS.RISE; // Continue same direction or start with RISE
-        case 'martingale':
-            return lastPrediction || PREDICTIONS.RISE; // Keep same prediction after loss or start with RISE
-        default:
-            return PREDICTIONS.RISE;
+    // Add color coding for profit/loss
+    const profitLossElement = document.getElementById('profitLoss');
+    if (tradingStats.profitLoss > 0) {
+        profitLossElement.className = 'stat-value text-success';
+    } else if (tradingStats.profitLoss < 0) {
+        profitLossElement.className = 'stat-value text-danger';
+    } else {
+        profitLossElement.className = 'stat-value';
     }
 }
 
-async function placeTrade() {
-    if (!isTrading) return;
+function resetRiseStats() {
+    tradingStats.riseTrades = 0;
+    tradingStats.riseWins = 0;
+    tradingStats.riseLosses = 0;
     
-    const marketSelect = document.getElementById('market');
-    const market = marketSelect.value;
-    const marketName = marketSelect.options[marketSelect.selectedIndex].text;
-    const stake = document.getElementById('stakeAmount').value;
-    const duration = document.getElementById('duration').value;
-    const durationType = document.getElementById('durationType').value;
-    const strategy = document.getElementById('tradingStrategy').value;
+    document.getElementById('riseTradeCount').textContent = '0';
+    document.getElementById('riseWinCount').textContent = '0';
+    document.getElementById('riseLossCount').textContent = '0';
     
-    // Get next prediction based on strategy
-    const prediction = getNextPrediction(strategy, currentContract?.lastPrediction);
+    addLogEntry('Rise trading statistics have been reset', 'warning');
+}
+
+function resetFallStats() {
+    tradingStats.fallTrades = 0;
+    tradingStats.fallWins = 0;
+    tradingStats.fallLosses = 0;
     
-    try {
-        addLogEntry(`Preparing ${prediction} trade on ${marketName} for ${stake} USD`, 'info');
-        
-        const proposalRequest = {
-            proposal: 1,
-            amount: parseFloat(stake),
-            basis: 'stake',
-            contract_type: prediction, // Will be either 'CALL' or 'PUT'
-            currency: 'USD',
-            symbol: market,
-            duration: parseInt(duration),
-            duration_unit: durationType
-        };
-        
-        ws.send(JSON.stringify(proposalRequest));
-        addLogEntry(`Requesting ${prediction} trade proposal for ${duration} ${durationType === 't' ? 'ticks' : 'minutes'} on ${marketName}...`, 'info');
-        
-    } catch (error) {
-        addLogEntry(`Trade error: ${error.message}`, 'error');
-        stopTrading();
+    document.getElementById('fallTradeCount').textContent = '0';
+    document.getElementById('fallWinCount').textContent = '0';
+    document.getElementById('fallLossCount').textContent = '0';
+    
+    addLogEntry('Fall trading statistics have been reset', 'warning');
+}
+
+// Add new function to reset all trading states
+function resetTradingStates() {
+    isWaitingForCompletion = false;
+    enableTradingButtons();
+    continuousDirection = null;
+    updateTradingButtonEffects();
+    
+    // Reset continuous trading if it was active
+    if (document.getElementById('continuousTrading').checked) {
+        document.getElementById('continuousTrading').checked = false;
+        document.getElementById('continuousTradingContainer').classList.remove('active');
+        document.getElementById('continuousTradingLabel').classList.remove('continuous-trading-active');
+    }
+    
+    // Reset martingale if it was active
+    if (martingaleEnabled) {
+        document.getElementById('martingaleEnabled').checked = false;
+        resetMartingale();
     }
 }
 
-function startTrading() {
-    isTrading = true;
-    document.getElementById('startBot').disabled = true;
-    document.getElementById('stopBot').disabled = false;
-    document.getElementById('stakeAmount').disabled = true;
-    document.getElementById('duration').disabled = true;
-    document.getElementById('market').disabled = true;
-    document.getElementById('tradingStrategy').disabled = true;
-    
-    addLogEntry('Bot started trading', 'success');
-    placeTrade();
-}
-
-function stopTrading() {
-    isTrading = false;
-    document.getElementById('startBot').disabled = false;
-    document.getElementById('stopBot').disabled = true;
-    document.getElementById('stakeAmount').disabled = false;
-    document.getElementById('duration').disabled = false;
-    document.getElementById('market').disabled = false;
-    document.getElementById('tradingStrategy').disabled = false;
-    
-    addLogEntry('Bot stopped trading', 'warning');
-}
-
-document.getElementById('apiForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const connectBtn = document.getElementById('connectBtn');
-    const token = document.getElementById('apiToken').value;
-
-    try {
-        connectBtn.classList.add('is-loading');
-        connectBtn.disabled = true;
-
-        // Store token in localStorage
-        localStorage.setItem('deriv_api_token', token);
-        
-        addLogEntry('Initializing connection to Deriv...', 'info');
-        
-        // Initialize WebSocket connection
-        ws = new WebSocket('wss://ws.binaryws.com/websockets/v3?app_id=1089');
-
-        ws.onopen = function() {
-            addLogEntry('WebSocket connection established', 'success');
-            addLogEntry('Authorizing with API token...', 'info');
-            ws.send(JSON.stringify({
-                authorize: token
-            }));
-        };
-
-        ws.onmessage = function(msg) {
-            const data = JSON.parse(msg.data);
-            
-            if (data.msg_type === 'authorize') {
-                if (data.error) {
-                    addLogEntry(`Authorization failed: ${data.error.message}`, 'error');
-                    // Remove invalid token
-                    localStorage.removeItem('deriv_api_token');
-                    throw new Error(data.error.message);
-                }
-                
-                addLogEntry('Successfully authorized', 'success');
-                addLogEntry(`Welcome back, ${data.authorize.fullname}`, 'info');
-                
-                document.getElementById('accountName').textContent = data.authorize.fullname;
-                document.getElementById('accountType').textContent = 
-                    data.authorize.landing_company_name.toUpperCase();
-
-                document.getElementById('tradingSection').style.display = 'block';
-                
-                addLogEntry('Requesting account balance...', 'info');
-                ws.send(JSON.stringify({
-                    balance: 1,
-                    subscribe: 1
-                }));
-            }
-            
-            if (data.msg_type === 'balance') {
-                if (data.error) {
-                    addLogEntry(`Balance request failed: ${data.error.message}`, 'error');
-                    throw new Error(data.error.message);
-                }
-                
-                const balance = parseFloat(data.balance.balance).toFixed(2);
-                const currency = data.balance.currency;
-                
-                addLogEntry(`Account balance: ${balance} ${currency}`, 'success');
-                
-                document.getElementById('balanceAmount').textContent = balance;
-                document.getElementById('balanceCurrency').textContent = currency;
-                document.getElementById('stakeCurrency').textContent = currency;
-
-                document.getElementById('accountInfo').style.display = 'block';
-                document.getElementById('apiForm').style.display = 'none';
-                
-                connectBtn.classList.remove('is-loading');
-                connectBtn.disabled = false;
-            }
-            
-            // Handle proposal response
-            if (data.msg_type === 'proposal') {
-                if (data.error) {
-                    addLogEntry(`Proposal error: ${data.error.message}`, 'error');
-                    return;
-                }
-                
-                // Place the trade with the proposal ID and price
-                const buyRequest = {
-                    buy: data.proposal.id,
-                    price: data.proposal.ask_price
-                };
-                
-                ws.send(JSON.stringify(buyRequest));
-                addLogEntry('Proposal received, placing trade...', 'info');
-            }
-            
-            // Handle buy response
-            if (data.msg_type === 'buy') {
-                if (data.error) {
-                    addLogEntry(`Trade error: ${data.error.message}`, 'error');
-                    return;
-                }
-                
-                currentContract = {
-                    id: data.buy.contract_id,
-                    lastPrediction: data.buy.longcode.includes('Rise') ? PREDICTIONS.RISE : PREDICTIONS.FALL
-                };
-                
-                addLogEntry(`Trade placed: ${data.buy.longcode}`, 'success');
-                
-                // Subscribe to contract updates
-                ws.send(JSON.stringify({
-                    proposal_open_contract: 1,
-                    contract_id: currentContract.id,
-                    subscribe: 1
-                }));
-            }
-            
-            // Handle contract updates
-            if (data.msg_type === 'proposal_open_contract') {
-                if (data.error) {
-                    addLogEntry(`Contract error: ${data.error.message}`, 'error');
-                    return;
-                }
-                
-                const contract = data.proposal_open_contract;
-                
-                if (contract.is_sold) {
-                    const profit = parseFloat(contract.profit);
-                    tradingStats.totalTrades++;
-                    
-                    if (profit > 0) {
-                        tradingStats.wins++;
-                        addLogEntry(`Trade won: +${profit} USD`, 'success');
-                        // On win, keep the same prediction for trend following
-                        if (document.getElementById('tradingStrategy').value === 'trend') {
-                            currentContract.lastPrediction = currentContract.lastPrediction;
-                        }
-                    } else {
-                        tradingStats.losses++;
-                        addLogEntry(`Trade lost: ${profit} USD`, 'error');
-                        // On loss, consider switching prediction based on strategy
-                        if (document.getElementById('tradingStrategy').value === 'alternating') {
-                            currentContract.lastPrediction = 
-                                currentContract.lastPrediction === PREDICTIONS.RISE ? 
-                                PREDICTIONS.FALL : PREDICTIONS.RISE;
-                        }
-                    }
-                    
-                    tradingStats.profitLoss += profit;
-                    updateStats();
-                    
-                    // Place next trade if still trading
-                    if (isTrading) {
-                        setTimeout(placeTrade, 1000);
-                    }
-                }
-            }
-        };
-
-        ws.onerror = function(error) {
-            addLogEntry('WebSocket error occurred', 'error');
-            throw new Error('WebSocket error occurred');
-        };
-
-        ws.onclose = function() {
-            addLogEntry('WebSocket connection closed', 'warning');
-        };
-
-    } catch (error) {
-        addLogEntry(`Connection error: ${error.message}`, 'error');
-        connectBtn.classList.remove('is-loading');
-        connectBtn.disabled = false;
-    }
-});
-
-// Add disconnect functionality
-function disconnectBot() {
-    if (ws) {
-        ws.close();
-    }
-    // Remove token from localStorage
-    localStorage.removeItem('deriv_api_token');
-    document.getElementById('apiForm').style.display = 'block';
-    document.getElementById('accountInfo').style.display = 'none';
-    document.getElementById('tradingSection').style.display = 'none';
-    addLogEntry('Disconnected from Deriv', 'warning');
-}
-
-// Add a disconnect button to the account info section
-document.getElementById('accountInfo').innerHTML += `
-    <button class="btn btn-outline-danger mt-3" id="disconnectBtn">
-        <i class="bx bx-log-out"></i> Disconnect
-    </button>
-`;
-
+// Add disconnect button handler
 document.getElementById('disconnectBtn').addEventListener('click', function() {
-    if (confirm('Are you sure you want to disconnect? Your API token will be removed.')) {
-        disconnectBot();
-    }
-});
-
-// Update the window beforeunload handler
-window.addEventListener('beforeunload', (event) => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (ws) {
+        resetTradingStates(); // Reset all states when disconnecting
         ws.close();
     }
-    // Don't remove the token on page reload/close
-    // localStorage.removeItem('deriv_api_token');
-});
-
-// Add visibilitychange handler to reconnect when page becomes visible
-document.addEventListener('visibilitychange', () => {
-    const token = localStorage.getItem('deriv_api_token');
-    if (!document.hidden && token && (!ws || ws.readyState !== WebSocket.OPEN)) {
-        // Reconnect if we have a token and connection is closed
-        document.getElementById('apiToken').value = token;
-        document.getElementById('apiForm').dispatchEvent(new Event('submit'));
-    }
-});
-
-// Event Listeners
-document.getElementById('startBot').addEventListener('click', startTrading);
-document.getElementById('stopBot').addEventListener('click', stopTrading);
-
-// Add this to your existing JavaScript
-document.getElementById('durationType').addEventListener('change', function() {
-    const durationType = this.value;
-    const durationInput = document.getElementById('duration');
-    const durationHelp = document.getElementById('durationHelp');
-    
-    if (durationType === 't') {
-        durationInput.max = 10;
-        durationInput.min = 1;
-        if (durationInput.value > 10) durationInput.value = 10;
-        durationHelp.textContent = 'Ticks: 1-10';
-    } else {
-        durationInput.max = 60;
-        durationInput.min = 1;
-        durationHelp.textContent = 'Minutes: 1-60';
-    }
-});
-
-// Add this to your existing JavaScript
-document.getElementById('market').addEventListener('change', function() {
-    const market = this.value;
-    const durationType = document.getElementById('durationType');
-    const duration = document.getElementById('duration');
-    
-    // Reset duration settings based on market type
-    if (market.startsWith('1HZ')) {
-        // 1-second markets typically use ticks
-        durationType.value = 't';
-        duration.max = 10;
-        if (duration.value > 10) duration.value = 10;
-        document.getElementById('durationHelp').textContent = 'Ticks: 1-10';
-    } else {
-        // Standard markets can use longer durations
-        if (durationType.value === 't') {
-            duration.max = 10;
-            if (duration.value > 10) duration.value = 10;
-        } else {
-            duration.max = 60;
-        }
-    }
-    
-    addLogEntry(`Selected market: ${this.options[this.selectedIndex].text}`, 'info');
 });
 </script>
-{% endblock %} 
+{% endblock %}

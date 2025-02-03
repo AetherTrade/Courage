@@ -27,11 +27,12 @@ def bot_access_required(bot_type):
             approval_map = {
                 'precision_master': 'precision_master_approved',
                 'trend_warrior': 'trend_warrior_approved',
-                'pattern_hunter': 'pattern_hunter_approved'
+                'pattern_hunter': 'pattern_hunter_approved',
+                'courage_flux': 'courage_flux_approved'
             }
             
-            if not getattr(current_user, approval_map[bot_type], False):
-                flash(f'You need approval to access the {bot_type.replace("_", " ").title()} bot.', 'warning')
+            if not hasattr(current_user, approval_map[bot_type]) or not getattr(current_user, approval_map[bot_type]):
+                flash('You need approval to access this bot.', 'warning')
                 return redirect(url_for('user.bots'))
             return f(*args, **kwargs)
         return decorated_function

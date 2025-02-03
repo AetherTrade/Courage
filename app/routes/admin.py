@@ -17,18 +17,21 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_view
 
-@bp.route('/')
+@bp.route('/admin')
 @login_required
-@admin_required
-def index():
-    total_users = User.query.count()
-    pending_users = User.query.filter_by(is_approved=False).count()
-    approved_users = User.query.filter_by(is_approved=True).count()
-    
-    return render_template('admin/index.html', 
-                         total_users=total_users,
-                         pending_users=pending_users,
-                         approved_users=approved_users)
+def index():  # This is the main admin index route
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('user.dashboard'))
+    return render_template('admin/index.html')
+
+@bp.route('/admin/dashboard')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        flash('Access denied. Admin privileges required.', 'danger')
+        return redirect(url_for('user.dashboard'))
+    return render_template('admin/dashboard.html')
 
 @bp.route('/users')
 @login_required
@@ -178,3 +181,48 @@ def toggle_bot_approval(user_id, bot_type):
     status = 'approved for' if getattr(user, approval_map[bot_type]) else 'disapproved from'
     flash(f'User {user.email} has been {status} {bot_type.replace("_", " ").title()}.', 'success')
     return redirect(url_for('admin.users'))
+
+@bp.route('/update_bot_access', methods=['POST'])
+@login_required
+def update_bot_access():
+    if not current_user.is_admin:
+        return jsonify({'success': False, 'message': 'Access denied'})
+
+    data = request.get_json()
+    user_id = data.get('user_id')
+    bot_type = data.get('bot_type')
+    approved = data.get('approved')
+
+    print(f"Received request - User ID: {user_id}, Bot: {bot_type}, Approved: {approved}")
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'})
+
+    try:
+        if bot_type == 'courage_flux':
+            user.courage_flux_approved = bool(approved)
+            db.session.commit()
+            db.session.refresh(user)
+            return jsonify({
+                'success': True, 
+                'message': 'Access updated successfully',
+                'new_value': user.courage_flux_approved
+            })
+        else:
+            bot_attributes = {
+                'precision_master': 'precision_master_approved',
+                'trend_warrior': 'trend_warrior_approved',
+                'pattern_hunter': 'pattern_hunter_approved'
+            }
+            if bot_type in bot_attributes:
+                setattr(user, bot_attributes[bot_type], approved)
+                db.session.commit()
+                return jsonify({'success': True, 'message': 'Access updated successfully'})
+            
+            return jsonify({'success': False, 'message': 'Invalid bot type'})
+            
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error updating bot access: {str(e)}")
+        return jsonify({'success': False, 'message': f'Database error: {str(e)}'})

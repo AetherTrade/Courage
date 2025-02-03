@@ -63,8 +63,25 @@
             <!-- Trading Stats Card -->
             <div class="card api-card mb-4" id="tradingStats" style="display: none;">
                 <div class="card-body">
-                    <h5 class="card-title mb-3">Trading Statistics</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">Trading Statistics</h5>
+                        <button class="btn btn-outline-secondary btn-sm" id="resetStats">
+                            <i class="bx bx-refresh"></i> Reset
+                        </button>
+                    </div>
                     <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Current Price</label>
+                                <div class="stat-value" id="currentPrice">0.00</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <label>Last Digit</label>
+                                <div class="last-digit" id="lastDigit">0</div>
+                            </div>
+                        </div>
                         <div class="col-md-3">
                             <div class="stat-item">
                                 <label>Total Trades</label>
@@ -75,18 +92,6 @@
                             <div class="stat-item">
                                 <label>Wins</label>
                                 <div class="stat-value text-success" id="winCount">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-item">
-                                <label>Losses</label>
-                                <div class="stat-value text-danger" id="lossCount">0</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-item">
-                                <label>Profit/Loss</label>
-                                <div class="stat-value" id="profitLoss">0.00</div>
                             </div>
                         </div>
                     </div>
@@ -393,6 +398,64 @@
         font-family: monospace;
         font-size: 1.2em;
     }
+
+    /* Add neon glow effect for current price */
+    #currentPrice {
+        color: #fff;
+        text-shadow: 
+            0 0 7px #fff,
+            0 0 10px #fff,
+            0 0 21px #fff,
+            0 0 42px #0fa,
+            0 0 82px #0fa,
+            0 0 92px #0fa,
+            0 0 102px #0fa,
+            0 0 151px #0fa;
+        animation: pulsate 1.5s infinite alternate;
+    }
+
+    @keyframes pulsate {
+        100% {
+            text-shadow: 
+                0 0 4px #fff,
+                0 0 11px #fff,
+                0 0 19px #fff,
+                0 0 40px #0fa,
+                0 0 80px #0fa,
+                0 0 90px #0fa,
+                0 0 100px #0fa,
+                0 0 150px #0fa;
+        }
+        0% {
+            text-shadow: 
+                0 0 2px #fff,
+                0 0 4px #fff,
+                0 0 6px #fff,
+                0 0 10px #0fa,
+                0 0 45px #0fa,
+                0 0 55px #0fa,
+                0 0 70px #0fa,
+                0 0 80px #0fa;
+        }
+    }
+
+    /* Last Digit styles */
+    .last-digit {
+        width: 60px;
+        height: 60px;
+        background: #2a3052;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+        margin: 0 auto;
+        border: 2px solid #4a5180;
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        text-shadow: none;
+    }
 </style>
 
 <script>
@@ -473,6 +536,13 @@ document.getElementById('apiForm').addEventListener('submit', function(e) {
             if (isTrading) {
                 analyzePriceData(data);
             }
+            // Update current price display with 2 decimal places
+            document.getElementById('currentPrice').textContent = 
+                parseFloat(data.tick.quote).toFixed(2);
+            
+            // Update last digit display
+            const lastDigit = data.tick.quote.toString().slice(-1);
+            document.getElementById('lastDigit').textContent = lastDigit;
         } else if (data.msg_type === 'proposal') {
             if (data.error) {
                 addLogEntry(`Proposal error: ${data.error.message}`, 'error');
@@ -506,22 +576,33 @@ document.getElementById('apiForm').addEventListener('submit', function(e) {
                 if (contractInfo) {
                     const profit = parseFloat(contract.profit);
                     const isWin = profit >= 0;
-                    const result = isWin ? 'WIN' : 'LOSS';
-                    const resultClass = isWin ? 'success' : 'error';
                     
-                    // Update stats
-                    const totalTrades = parseInt(document.getElementById('totalTrades').textContent) + 1;
-                    const wins = parseInt(document.getElementById('winCount').textContent) + (isWin ? 1 : 0);
-                    const losses = parseInt(document.getElementById('lossCount').textContent) + (isWin ? 0 : 1);
-                    const profitLoss = parseFloat(document.getElementById('profitLoss').textContent) + profit;
+                    // Update trading statistics
+                    tradingStats.totalTrades++;
+                    if (isWin) {
+                        tradingStats.wins++;
+                    } else {
+                        tradingStats.losses++;
+                    }
+                    tradingStats.profitLoss += profit;
                     
-                    document.getElementById('totalTrades').textContent = totalTrades;
-                    document.getElementById('winCount').textContent = wins;
-                    document.getElementById('lossCount').textContent = losses;
-                    document.getElementById('profitLoss').textContent = profitLoss.toFixed(2);
+                    // Update display
+                    document.getElementById('totalTrades').textContent = tradingStats.totalTrades;
+                    document.getElementById('winCount').textContent = tradingStats.wins;
+                    document.getElementById('lossCount').textContent = tradingStats.losses;
+                    document.getElementById('profitLoss').textContent = tradingStats.profitLoss.toFixed(2);
+                    
+                    // Add color coding for profit/loss
+                    const profitLossElement = document.getElementById('profitLoss');
+                    if (tradingStats.profitLoss > 0) {
+                        profitLossElement.className = 'text-success';
+                    } else if (tradingStats.profitLoss < 0) {
+                        profitLossElement.className = 'text-danger';
+                    }
                     
                     // Log result
-                    addLogEntry(`Trade Result: ${result} | Profit: ${profit.toFixed(2)} USD | Digit: ${contractInfo.digit}`, resultClass);
+                    const resultClass = isWin ? 'success' : 'error';
+                    addLogEntry(`Trade Result: ${isWin ? 'WIN' : 'LOSS'} | Profit: ${profit.toFixed(2)} USD | Digit: ${contractInfo.digit}`, resultClass);
                     
                     // Remove from tracking
                     activeContracts.delete(contract.contract_id);
@@ -542,7 +623,8 @@ function analyzePriceData(data) {
     const currentTime = Date.now();
     if (currentTime - lastTradeTime < TRADE_DELAY) return;
     
-    const lastDigit = parseInt(data.tick.quote.toString().slice(-1));
+    // Use the last digit from the rounded price
+    const lastDigit = parseInt(data.tick.quote.toFixed(2).toString().slice(-1));
     const patternLength = parseInt(document.getElementById('patternLength').value);
     
     // Add digit to history
@@ -562,16 +644,36 @@ function analyzePriceData(data) {
         
         if (patternMatch) {
             addLogEntry(`Pattern matched! Current: ${currentPattern.join('')}, Target: ${customPattern.join('')}`, 'success');
+            
+            // Always use manual digit if manual input is selected
+            const targetDigitType = document.getElementById('targetDigit').value;
+            let targetDigit;
+            
+            if (targetDigitType === 'manual') {
+                targetDigit = parseInt(document.getElementById('manualDigit').value);
+                addLogEntry(`Using manual target digit: ${targetDigit}`, 'info');
+            } else {
+                // Use manual digit from input if available, otherwise use last digit
+                targetDigit = parseInt(document.getElementById('manualDigit').value);
+                addLogEntry(`Using manual digit: ${targetDigit}`, 'info');
+            }
+            
+            // Get trade type
             const tradeType = document.getElementById('tradeType').value;
-            requestProposal(tradeType, lastDigit);
+            
+            // Place trade with target digit
+            requestProposal(tradeType, targetDigit);
             lastTradeTime = currentTime;
         } else {
             addLogEntry(`Waiting for pattern... Current: ${currentPattern.join('')}, Target: ${customPattern.join('')}`, 'info');
         }
     } else {
-        // Normal trading without pattern
+        // Normal trading without pattern - still use manual digit
+        const targetDigit = parseInt(document.getElementById('manualDigit').value);
         const tradeType = document.getElementById('tradeType').value;
-        requestProposal(tradeType, lastDigit);
+        
+        addLogEntry(`Trading with manual target digit: ${targetDigit}`, 'info');
+        requestProposal(tradeType, targetDigit);
         lastTradeTime = currentTime;
     }
 }
@@ -668,8 +770,10 @@ document.getElementById('targetDigit').addEventListener('change', function() {
     const manualDigitDiv = document.getElementById('manualDigitDiv');
     if (this.value === 'manual') {
         manualDigitDiv.style.display = 'block';
+        addLogEntry('Switched to manual target digit mode', 'info');
     } else {
         manualDigitDiv.style.display = 'none';
+        addLogEntry('Using last digit from pattern as target', 'info');
     }
 });
 
@@ -749,62 +853,42 @@ document.getElementById('martingaleMultiplier').addEventListener('input', functi
     }
 });
 
-// Update the WebSocket message handler for Martingale
-ws.onmessage = function(msg) {
-    const data = JSON.parse(msg.data);
-    
-    if (data.msg_type === 'proposal_open_contract') {
-        const contract = data.proposal_open_contract;
-        
-        if (contract.is_sold) {
-            const contractInfo = activeContracts.get(contract.contract_id);
-            if (contractInfo) {
-                const profit = parseFloat(contract.profit);
-                const isWin = profit >= 0;
-                lastTradeResult = isWin;
-                
-                // Update Martingale stake
-                if (document.getElementById('martingaleStrategy').checked) {
-                    const multiplier = parseFloat(document.getElementById('martingaleMultiplier').value);
-                    if (isWin) {
-                        // Reset stake after win
-                        currentStake = parseFloat(document.getElementById('stakeAmount').value);
-                        addLogEntry(`Win! Resetting stake to $${currentStake}`, 'success');
-                    } else {
-                        // Increase stake after loss
-                        currentStake = currentStake * multiplier;
-                        addLogEntry(`Loss! Increasing stake to $${currentStake.toFixed(2)}`, 'warning');
-                    }
-                }
-                
-                // Update stats and log results
-                updateStats(isWin, profit);
-                addLogEntry(`Trade Result: ${isWin ? 'WIN' : 'LOSS'} | Profit: ${profit.toFixed(2)} USD`, isWin ? 'success' : 'error');
-                activeContracts.delete(contract.contract_id);
-            }
-        }
-    }
-    // ... rest of your message handling
+// Add trading stats object if not already present
+const tradingStats = {
+    totalTrades: 0,
+    wins: 0,
+    losses: 0,
+    profitLoss: 0
 };
 
-// Add function to update stats
-function updateStats(isWin, profit) {
-    const totalTrades = parseInt(document.getElementById('totalTrades').textContent) + 1;
-    const wins = parseInt(document.getElementById('winCount').textContent) + (isWin ? 1 : 0);
-    const losses = parseInt(document.getElementById('lossCount').textContent) + (isWin ? 0 : 1);
-    const profitLoss = parseFloat(document.getElementById('profitLoss').textContent) + profit;
+// Add function to reset trading stats
+function resetTradingStats() {
+    tradingStats.totalTrades = 0;
+    tradingStats.wins = 0;
+    tradingStats.losses = 0;
+    tradingStats.profitLoss = 0;
     
-    document.getElementById('totalTrades').textContent = totalTrades;
-    document.getElementById('winCount').textContent = wins;
-    document.getElementById('lossCount').textContent = losses;
-    document.getElementById('profitLoss').textContent = profitLoss.toFixed(2);
+    // Update display
+    document.getElementById('totalTrades').textContent = '0';
+    document.getElementById('winCount').textContent = '0';
+    document.getElementById('lossCount').textContent = '0';
+    document.getElementById('profitLoss').textContent = '0.00';
+    
+    addLogEntry('Trading statistics have been reset', 'warning');
 }
 
-// Reset Martingale on bot start
-document.getElementById('startBot').addEventListener('click', function() {
-    currentStake = parseFloat(document.getElementById('stakeAmount').value);
-    lastTradeResult = null;
-    // ... rest of your start bot code
+// Add reset stats button handler
+document.getElementById('resetStats').addEventListener('click', function() {
+    resetTradingStats();
+});
+
+// Reset stats when disconnecting
+document.getElementById('disconnectBtn').addEventListener('click', function() {
+    if (ws) {
+        resetTradingStats();
+        resetTradingStates();
+        ws.close();
+    }
 });
 </script>
-{% endblock %} 
+{% endblock %}

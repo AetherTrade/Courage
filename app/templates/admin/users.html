@@ -16,9 +16,10 @@
                     <thead>
                         <tr>
                             <th>Email</th>
-                            <th>Trend Warrior</th>
                             <th>Precision Master</th>
+                            <th>Trend Warrior</th>
                             <th>Pattern Hunter</th>
+                            <th>Courage Flux</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -27,39 +28,40 @@
                         <tr>
                             <td>{{ user.email }}</td>
                             <td>
-                                <form action="{{ url_for('admin.toggle_bot_approval', user_id=user.id, bot_type='precision_master') }}" 
-                                      method="POST" class="d-inline">
-                                    <button type="submit" 
-                                            class="btn btn-sm {{ 'btn-success' if user.precision_master_approved else 'btn-outline-success' }}">
-                                        <i class="bx {{ 'bx-check' if user.precision_master_approved else 'bx-x' }}"></i>
-                                        {{ 'Approved' if user.precision_master_approved else 'Not Approved' }}
-                                    </button>
-                                </form>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input bot-approval" type="checkbox" 
+                                           data-user-id="{{ user.id }}" 
+                                           data-bot-type="precision_master" 
+                                           {{ 'checked' if user.precision_master_approved }}>
+                                </div>
                             </td>
                             <td>
-                                <form action="{{ url_for('admin.toggle_bot_approval', user_id=user.id, bot_type='trend_warrior') }}" 
-                                      method="POST" class="d-inline">
-                                    <button type="submit" 
-                                            class="btn btn-sm {{ 'btn-success' if user.trend_warrior_approved else 'btn-outline-success' }}">
-                                        <i class="bx {{ 'bx-check' if user.trend_warrior_approved else 'bx-x' }}"></i>
-                                        {{ 'Approved' if user.trend_warrior_approved else 'Not Approved' }}
-                                    </button>
-                                </form>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input bot-approval" type="checkbox" 
+                                           data-user-id="{{ user.id }}" 
+                                           data-bot-type="trend_warrior" 
+                                           {{ 'checked' if user.trend_warrior_approved }}>
+                                </div>
                             </td>
                             <td>
-                                <form action="{{ url_for('admin.toggle_bot_approval', user_id=user.id, bot_type='pattern_hunter') }}" 
-                                      method="POST" class="d-inline">
-                                    <button type="submit" 
-                                            class="btn btn-sm {{ 'btn-success' if user.pattern_hunter_approved else 'btn-outline-success' }}">
-                                        <i class="bx {{ 'bx-check' if user.pattern_hunter_approved else 'bx-x' }}"></i>
-                                        {{ 'Approved' if user.pattern_hunter_approved else 'Not Approved' }}
-                                    </button>
-                                </form>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input bot-approval" type="checkbox" 
+                                           data-user-id="{{ user.id }}" 
+                                           data-bot-type="pattern_hunter" 
+                                           {{ 'checked' if user.pattern_hunter_approved }}>
+                                </div>
                             </td>
                             <td>
-                                <button type="button" class="btn btn-sm btn-danger" 
-                                        onclick="confirmDelete('{{ user.email }}', {{ user.id }})">
-                                    <i class="bx bx-trash"></i> Delete
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input bot-approval" type="checkbox" 
+                                           data-user-id="{{ user.id }}" 
+                                           data-bot-type="courage_flux" 
+                                           {{ 'checked' if user.courage_flux_approved }}>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-danger delete-user" data-user-id="{{ user.id }}">
+                                    <i class="bx bx-trash"></i>
                                 </button>
                             </td>
                         </tr>
@@ -152,10 +154,103 @@
 
 {% block extra_js %}
 <script>
-function confirmDelete(email, userId) {
-    document.getElementById('deleteUserEmail').textContent = email;
-    document.getElementById('deleteForm').action = "{{ url_for('admin.remove_user', user_id=0) }}".replace('0', userId);
-    new bootstrap.Modal(document.getElementById('deleteModal')).show();
-}
+document.addEventListener('DOMContentLoaded', function() {
+    // Bot approval handler
+    document.querySelectorAll('.bot-approval').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const userId = this.dataset.userId;
+            const botType = this.dataset.botType;
+            const approved = this.checked;
+
+            console.log('Sending approval update:', {
+                userId,
+                botType,
+                approved
+            });
+
+            fetch('/admin/update_bot_access', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'  // Add this header
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    bot_type: botType,
+                    approved: approved
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Server response:', data);
+                if (data.success) {
+                    showAlert('Access updated successfully', 'success');
+                    // Optionally reload the page to show updated state
+                    // window.location.reload();
+                } else {
+                    showAlert('Failed to update access: ' + data.message, 'danger');
+                    this.checked = !approved;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('An error occurred', 'danger');
+                this.checked = !approved;
+            });
+        });
+    });
+
+    // Existing delete user handler
+    document.querySelectorAll('.delete-user').forEach(button => {
+        button.addEventListener('click', function() {
+            if (confirm('Are you sure you want to delete this user?')) {
+                const userId = this.dataset.userId;
+                
+                fetch(`/admin/delete_user/${userId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the row from the table
+                        this.closest('tr').remove();
+                        showAlert('User deleted successfully', 'success');
+                    } else {
+                        showAlert('Failed to delete user', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('An error occurred', 'danger');
+                });
+            }
+        });
+    });
+
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        
+        const container = document.querySelector('.container');
+        const card = document.querySelector('.card');
+        if (container && card) {
+            container.insertBefore(alertDiv, card);
+            
+            // Auto dismiss after 3 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+    }
+});
 </script>
 {% endblock %}

@@ -166,33 +166,45 @@
                     <div class="bot-icon">
                         <i class="bx bx-trending-up"></i>
                     </div>
-                    <span class="status-badge">Active</span>
+                    <span class="status-badge">
+                        {% if current_user.trend_warrior_approved %}
+                            Active
+                        {% else %}
+                            Awaiting Approval
+                        {% endif %}
+                    </span>
                     
                     <h3 class="card-title mb-2">CourageFX Trend Warrior</h3>
                     <p class="text-accent mb-4">Rise/Fall Market Expert</p>
                     
                     <div class="features mb-4">
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-chart text-success"></i>
                             <span>Trend direction analysis</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-time-five text-success"></i>
                             <span>Multiple timeframe strategy</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-target-lock text-success"></i>
                             <span>Dynamic entry points</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-bot text-success"></i>
                             <span>Automated trend following</span>
                         </div>
                     </div>
                     
-                    <a href="{{ url_for('user.precision_master') }}" class="btn btn-glow w-100">
-                        <i class="bx bx-trending-up me-2"></i> Launch Trend Warrior
+                    {% if current_user.trend_warrior_approved %}
+                    <a href="{{ url_for('user.trend_warrior') }}" class="btn btn-glow w-100">
+                        <i class="bx bx-rocket me-2"></i>Launch Trend Warrior
                     </a>
+                    {% else %}
+                    <button class="btn btn-glow w-100" disabled>
+                        <i class="bx bx-time me-2"></i>Awaiting Approval
+                    </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -204,33 +216,45 @@
                     <div class="bot-icon">
                         <i class="bx bx-target-lock"></i>
                     </div>
-                    <span class="status-badge">Active</span>
+                    <span class="status-badge">
+                        {% if current_user.precision_master_approved %}
+                            Active
+                        {% else %}
+                            Awaiting Approval
+                        {% endif %}
+                    </span>
                     
                     <h3 class="card-title mb-2">CourageFX Precision Master</h3>
                     <p class="text-accent mb-4">Over/Under Market Specialist</p>
                     
                     <div class="features mb-4">
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-analyse text-success"></i>
                             <span>Advanced over/under predictions</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-pulse text-success"></i>
                             <span>Market momentum analysis</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-shield text-success"></i>
                             <span>Risk management system</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-radar text-success"></i>
                             <span>Real-time market scanning</span>
                         </div>
                     </div>
                     
-                    <a href="{{ url_for('user.trend_warrior') }}" class="btn btn-glow w-100">
-                        <i class="bx bx-target-lock me-2"></i> Launch Precision Master
+                    {% if current_user.precision_master_approved %}
+                    <a href="{{ url_for('user.precision_master') }}" class="btn btn-glow w-100">
+                        <i class="bx bx-rocket me-2"></i>Launch Precision Master
                     </a>
+                    {% else %}
+                    <button class="btn btn-glow w-100" disabled>
+                        <i class="bx bx-time me-2"></i>Awaiting Approval
+                    </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -242,33 +266,95 @@
                     <div class="bot-icon">
                         <i class="bx bx-radar"></i>
                     </div>
-                    <span class="status-badge">Active</span>
+                    <span class="status-badge">
+                        {% if current_user.pattern_hunter_approved %}
+                            Active
+                        {% else %}
+                            Awaiting Approval
+                        {% endif %}
+                    </span>
                     
                     <h3 class="card-title mb-2">CourageFX Pattern Hunter</h3>
                     <p class="text-accent mb-4">Pattern Recognition Expert</p>
                     
                     <div class="features mb-4">
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-shape-triangle text-success"></i>
                             <span>Advanced pattern recognition</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-grid-alt text-success"></i>
                             <span>Multi-pattern analysis</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-crosshair text-success"></i>
                             <span>Entry/exit optimization</span>
                         </div>
                         <div class="feature-item">
-                            <i class="bx bx-check-circle text-success"></i>
+                            <i class="bx bx-bell text-success"></i>
                             <span>Real-time pattern alerts</span>
                         </div>
                     </div>
                     
+                    {% if current_user.pattern_hunter_approved %}
                     <a href="{{ url_for('user.pattern_hunter') }}" class="btn btn-glow w-100">
-                        <i class="bx bx-radar me-2"></i> Launch Pattern Hunter
+                        <i class="bx bx-rocket me-2"></i>Launch Pattern Hunter
                     </a>
+                    {% else %}
+                    <button class="btn btn-glow w-100" disabled>
+                        <i class="bx bx-time me-2"></i>Awaiting Approval
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Courage Flux Bot Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 bot-card">
+                <div class="card-body position-relative p-4">
+                    <div class="bot-icon">
+                        <i class="bx bx-line-chart"></i>
+                    </div>
+                    <span class="status-badge">
+                        {% if current_user.courage_flux_approved %}
+                            Active
+                        {% else %}
+                            Awaiting Approval
+                        {% endif %}
+                    </span>
+                    
+                    <h3 class="card-title mb-2">Courage Flux Bot</h3>
+                    <p class="text-accent mb-4">Advanced Over/Under Pattern Analyzer</p>
+                    
+                    <div class="features mb-4">
+                        <div class="feature-item">
+                            <i class="bx bx-analyse text-success"></i>
+                            <span>Flux Pattern Recognition</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-line-chart-down text-success"></i>
+                            <span>Dynamic Over/Under Analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-target-lock text-success"></i>
+                            <span>Momentum-based Entry Points</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bx bx-shield text-success"></i>
+                            <span>Advanced Risk Management</span>
+                        </div>
+                    </div>
+                    
+                    {% if current_user.courage_flux_approved %}
+                    <a href="{{ url_for('user.courage_flux') }}" class="btn btn-glow w-100">
+                        <i class="bx bx-rocket me-2"></i>Launch Flux Bot
+                    </a>
+                    {% else %}
+                    <button class="btn btn-glow w-100" disabled>
+                        <i class="bx bx-time me-2"></i>Awaiting Approval
+                    </button>
+                    {% endif %}
                 </div>
             </div>
         </div>

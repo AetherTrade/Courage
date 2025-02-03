@@ -36,10 +36,26 @@ def trend_warrior():
 def pattern_hunter():
     return render_template('user/bots/pattern_hunter.html')
 
+@bp.route('/bots/courage-flux')
+@login_required
+@bot_access_required('courage_flux')
+def courage_flux():
+    return render_template('user/bots/courage_flux.html')
+
 @bp.route('/bots')
 @login_required
-@approved_required
 def bots():
+    # Check if user is approved for any bots
+    has_approved_bots = (
+        current_user.trend_warrior_approved or 
+        current_user.precision_master_approved or 
+        current_user.pattern_hunter_approved
+    )
+    
+    if not has_approved_bots:
+        flash('Please wait for admin approval to access trading bots.', 'warning')
+        return redirect(url_for('user.dashboard'))
+        
     user_bots = Bot.query.filter_by(user_id=current_user.id).all()
     return render_template('user/bots.html', bots=user_bots)
 

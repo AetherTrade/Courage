@@ -84,14 +84,21 @@
             <!-- API Keys -->
             <div class="card mt-4">
                 <div class="card-body">
-                    <h5 class="card-title mb-4">API Keys</h5>
+                    <h5 class="card-title mb-4">Deriv API Token</h5>
                     <div class="mb-3">
-                        <label class="form-label">Your API Key</label>
+                        <label class="form-label">Your Deriv API Token</label>
                         <div class="input-group">
-                            <input type="text" class="form-control" id="apiKey" readonly>
-                            <button class="btn btn-outline-secondary" type="button" onclick="generateApiKey()">
-                                <i class="bx bx-refresh"></i> Generate New
+                            <input type="password" class="form-control" id="derivApiToken" 
+                                   placeholder="Paste your Deriv API token here">
+                            <button class="btn btn-outline-secondary" type="button" id="toggleApiView">
+                                <i class="bx bx-show"></i>
                             </button>
+                            <button class="btn btn-primary" type="button" id="saveApiToken">
+                                <i class="bx bx-save"></i> Save Token
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            Get your API token from <a href="https://app.deriv.com/account/api-token" target="_blank">Deriv</a>
                         </div>
                     </div>
                 </div>
@@ -99,6 +106,67 @@
         </div>
     </div>
 </div>
+
+<script>
+// Add this to your existing JavaScript or create new script section
+document.addEventListener('DOMContentLoaded', function() {
+    const derivApiToken = document.getElementById('derivApiToken');
+    const toggleApiView = document.getElementById('toggleApiView');
+    const saveApiToken = document.getElementById('saveApiToken');
+
+    // Load existing token if available
+    const storedToken = localStorage.getItem('deriv_api_token');
+    if (storedToken) {
+        derivApiToken.value = storedToken;
+    }
+
+    // Toggle API token visibility
+    toggleApiView.addEventListener('click', function() {
+        const type = derivApiToken.type === 'password' ? 'text' : 'password';
+        derivApiToken.type = type;
+        toggleApiView.innerHTML = type === 'password' ? 
+            '<i class="bx bx-show"></i>' : 
+            '<i class="bx bx-hide"></i>';
+    });
+
+    // Save API token
+    saveApiToken.addEventListener('click', function() {
+        const token = derivApiToken.value.trim();
+        if (!token) {
+            alert('Please enter a valid API token');
+            return;
+        }
+
+        // Store in localStorage
+        localStorage.setItem('deriv_api_token', token);
+
+        // Show success message
+        const successAlert = document.createElement('div');
+        successAlert.className = 'alert alert-success mt-2';
+        successAlert.innerHTML = `
+            <i class="bx bx-check"></i> API token saved successfully! 
+            Your bots will use this token on next connection.
+        `;
+        derivApiToken.parentElement.parentElement.appendChild(successAlert);
+
+        // Remove success message after 3 seconds
+        setTimeout(() => {
+            successAlert.remove();
+        }, 3000);
+
+        // Reset input type to password for security
+        derivApiToken.type = 'password';
+        toggleApiView.innerHTML = '<i class="bx bx-show"></i>';
+    });
+
+    // Allow pasting
+    derivApiToken.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = e.clipboardData.getData('text');
+        this.value = text.trim();
+    });
+});
+</script>
 {% endblock %}
 
 {% block extra_js %}
